@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from './Header';
-import './index.css'; // если не подключено
+import './index.css';
 import About from './About';
 import Projects from './Projects';
 import Contact from './Contact';
