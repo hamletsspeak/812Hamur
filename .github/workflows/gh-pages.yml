@@ -10,10 +10,10 @@ jobs:
       with:
         node-version: 18
     - name: Install npm deps
-      working-directory: ./exam
+      working-directory: ./
       run: npm i
     - name: Build app
-      working-directory: ./exam
+      working-directory: ./
       run: npm run build
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
