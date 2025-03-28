@@ -1,6 +1,7 @@
 {
   "name": "my-portfolio",
   "version": "0.1.0",
+  "homepage": "https://hamletsspeak.github.io/my-portfolio",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
