@@ -1,10 +1,10 @@
 {
   "files": {
     "main.css": "/my-portfolio/static/css/main.23d12004.css",
-    "main.js": "/my-portfolio/static/js/main.b1df1e8b.js",
+    "main.js": "/my-portfolio/static/js/main.eb4400b8.js",
     "static/js/339.0f9a78cf.chunk.js": "/my-portfolio/static/js/339.0f9a78cf.chunk.js",
     "static/js/549.d174984a.chunk.js": "/my-portfolio/static/js/549.d174984a.chunk.js",
-    "static/js/879.b157d82f.chunk.js": "/my-portfolio/static/js/879.b157d82f.chunk.js",
+    "static/js/879.f6c060e7.chunk.js": "/my-portfolio/static/js/879.f6c060e7.chunk.js",
     "static/js/668.65980385.chunk.js": "/my-portfolio/static/js/668.65980385.chunk.js",
     "static/js/913.130bc89a.chunk.js": "/my-portfolio/static/js/913.130bc89a.chunk.js",
     "static/js/22.1cc0dd2e.chunk.js": "/my-portfolio/static/js/22.1cc0dd2e.chunk.js",
@@ -16,10 +16,10 @@
     "static/media/telegram-icon.png": "/my-portfolio/static/media/telegram-icon.5d8b65f5e935acaad1ec.png",
     "index.html": "/my-portfolio/index.html",
     "main.23d12004.css.map": "/my-portfolio/static/css/main.23d12004.css.map",
-    "main.b1df1e8b.js.map": "/my-portfolio/static/js/main.b1df1e8b.js.map",
+    "main.eb4400b8.js.map": "/my-portfolio/static/js/main.eb4400b8.js.map",
     "339.0f9a78cf.chunk.js.map": "/my-portfolio/static/js/339.0f9a78cf.chunk.js.map",
     "549.d174984a.chunk.js.map": "/my-portfolio/static/js/549.d174984a.chunk.js.map",
-    "879.b157d82f.chunk.js.map": "/my-portfolio/static/js/879.b157d82f.chunk.js.map",
+    "879.f6c060e7.chunk.js.map": "/my-portfolio/static/js/879.f6c060e7.chunk.js.map",
     "668.65980385.chunk.js.map": "/my-portfolio/static/js/668.65980385.chunk.js.map",
     "913.130bc89a.chunk.js.map": "/my-portfolio/static/js/913.130bc89a.chunk.js.map",
     "22.1cc0dd2e.chunk.js.map": "/my-portfolio/static/js/22.1cc0dd2e.chunk.js.map",
@@ -29,6 +29,6 @@
   },
   "entrypoints": [
     "static/css/main.23d12004.css",
-    "static/js/main.b1df1e8b.js"
+    "static/js/main.eb4400b8.js"
   ]
 }
