@@ -21,10 +21,12 @@ const ProjectCard = memo(({ project, onViewGithub, direction }) => (
     }}
     transition={{ 
       type: "spring",
+      damping: 20,
       stiffness: 300,
-      damping: 30
+      mass: 0.5,
+      duration: 0.3
     }}
-    className="bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] text-white rounded-xl shadow-xl p-4 sm:p-6 w-full max-w-[90%] sm:max-w-md mx-auto border border-white/10 hover:border-blue-500/50 transition-all duration-300"
+    className="bg-[#222] text-white rounded-lg shadow-lg p-6 w-full max-w-md border border-white/10"
   >
     <h3 className="text-xl sm:text-2xl font-bold mb-3 text-blue-400">{project.name}</h3>
     <p className="mt-2 sm:mt-4 text-sm sm:text-base text-gray-300 leading-relaxed">{project.description}</p>

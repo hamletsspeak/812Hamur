@@ -61,7 +61,7 @@ const Navbar = () => {
 
       <ul className={`${
         menuOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
-      } fixed sm:relative top-0 left-0 h-screen sm:h-auto w-full sm:w-auto bg-[#1f1f1f]/95 sm:bg-transparent flex flex-col sm:flex-row items-center justify-center gap-8 text-white transition-transform duration-300 backdrop-blur-sm sm:backdrop-blur-none`}>
+      } fixed sm:relative top-0 left-0 h-screen sm:h-auto w-full sm:w-auto bg-[#1f1f1f]/95 sm:bg-transparent flex flex-col sm:flex-row items-center justify-center gap-8 text-white transition-transform duration-500 ease-out will-change-transform backdrop-blur-sm sm:backdrop-blur-none`}>
         {location.pathname === '/' && mainLinks.map(link => (
           <li key={link.id}>
             <a 
