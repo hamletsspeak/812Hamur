@@ -9,20 +9,23 @@ const ContactLink = memo(({ href, icon, alt, text }) => (
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="flex items-center gap-4 hover:scale-105 transition-transform bg-[#1f1f1f] p-4 rounded-lg w-full max-w-md"
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
+    className="flex items-center gap-4 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-6 rounded-xl w-full max-w-md border border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-lg"
+    whileHover={{ scale: 1.02, y: -5 }}
+    whileTap={{ scale: 0.98 }}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
   >
-    <div className="w-8 h-8 flex-shrink-0">
+    <div className="w-10 h-10 flex-shrink-0 bg-white/5 rounded-lg p-2 transition-transform duration-300 group-hover:scale-110">
       <OptimizedImage
         src={icon}
         alt={alt}
-        width={32}
-        height={32}
+        width={40}
+        height={40}
         className="w-full h-full object-contain"
       />
     </div>
-    <span className="text-lg">{text}</span>
+    <span className="text-lg font-medium text-gray-200 hover:text-blue-400 transition-colors duration-300">{text}</span>
   </m.a>
 ));
 
@@ -30,16 +33,17 @@ const Contact = memo(() => {
   return (
     <section
       id="contact"
-      className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-6"
+      className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center p-8"
     >
       <m.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}
-        className="text-center w-full"
+        className="w-full max-w-4xl mx-auto text-center"
       >
-        <h2 className="text-4xl font-bold mb-8 shimmer-text">Контакты</h2>
+        <h2 className="text-5xl font-bold mb-12 shimmer-text">Контакты</h2>
+        <p className="text-xl text-gray-400 mb-8">Свяжитесь со мной удобным для вас способом</p>
         <div className="flex flex-col gap-6 items-center">
           <ContactLink
             href="mailto:gamleturusadze@gmail.com"

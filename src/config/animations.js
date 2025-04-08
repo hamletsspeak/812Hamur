@@ -1,4 +1,4 @@
-import { m, domAnimation, LazyMotion } from "framer-motion";
+import { m, domAnimation, LazyMotion, AnimatePresence } from "framer-motion";
 
 export const slideUpVariant = {
   hidden: { opacity: 0, y: 20 },
@@ -26,7 +26,7 @@ export const scaleUpVariant = {
   }
 };
 
-export { m }; // Экспортируем m для использования в других компонентах
+export { m, AnimatePresence }; // Экспортируем m и AnimatePresence
 
 // Создаем провайдер анимаций
 export const AnimationProvider = ({ children }) => (

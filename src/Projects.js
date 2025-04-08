@@ -1,26 +1,42 @@
 import React, { useState, useEffect, memo } from 'react';
-import { m } from './config/animations';
+import { m, AnimatePresence } from './config/animations';
 import { getRepositories } from './services/githubService';
 
-const ProjectCard = memo(({ project, onViewGithub }) => (
+const ProjectCard = memo(({ project, onViewGithub, direction }) => (
   <m.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -20 }}
-    transition={{ duration: 0.3 }}
-    className="bg-[#222] text-white rounded-lg shadow-lg p-6 w-full max-w-md border border-white/10"
+    initial={{ 
+      opacity: 0,
+      y: direction === 'right' ? 20 : -20,
+      scale: 0.95
+    }}
+    animate={{ 
+      opacity: 1,
+      y: 0,
+      scale: 1
+    }}
+    exit={{ 
+      opacity: 0,
+      y: direction === 'right' ? -20 : 20,
+      scale: 0.95
+    }}
+    transition={{ 
+      type: "spring",
+      stiffness: 300,
+      damping: 30
+    }}
+    className="bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] text-white rounded-xl shadow-xl p-4 sm:p-6 w-full max-w-[90%] sm:max-w-md mx-auto border border-white/10 hover:border-blue-500/50 transition-all duration-300"
   >
-    <h3 className="text-2xl font-bold mb-2">{project.name}</h3>
-    <p className="mt-2 text-gray-300">{project.description}</p>
+    <h3 className="text-xl sm:text-2xl font-bold mb-3 text-blue-400">{project.name}</h3>
+    <p className="mt-2 sm:mt-4 text-sm sm:text-base text-gray-300 leading-relaxed">{project.description}</p>
     {project.language && (
-      <p className="mt-2 text-blue-400">Технология: {project.language}</p>
+      <p className="mt-2 sm:mt-4 text-sm sm:text-base text-blue-400 font-medium">Технология: {project.language}</p>
     )}
     {project.stars > 0 && (
-      <p className="mt-2 text-yellow-400">⭐ {project.stars}</p>
+      <p className="mt-2 text-sm sm:text-base text-yellow-400 font-medium">⭐ {project.stars}</p>
     )}
     <button
       onClick={() => onViewGithub(project.link)}
-      className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+      className="mt-4 sm:mt-6 bg-blue-500 text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 font-medium"
     >
       Смотреть на GitHub
     </button>
@@ -31,6 +47,7 @@ ProjectCard.displayName = 'ProjectCard';
 
 const Projects = () => {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState('right');
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -101,10 +118,12 @@ const Projects = () => {
   };
 
   const handlePrev = () => {
+    setDirection('left');
     setCurrent(prev => (prev - 1 + projects.length) % projects.length);
   };
 
   const handleNext = () => {
+    setDirection('right');
     setCurrent(prev => (prev + 1) % projects.length);
   };
 
@@ -119,18 +138,20 @@ const Projects = () => {
 
   if (loading) {
     return (
-      <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-6">
-        <h2 className="text-4xl font-bold mb-8 text-center shimmer-text">Мои проекты</h2>
-        <div className="space-y-4 w-full max-w-md">
-          <div className="h-8 bg-gray-700 rounded-lg animate-pulse"></div>
-          <div className="h-32 bg-gray-700 rounded-lg animate-pulse"></div>
-          <div className="flex justify-center gap-4 mt-4">
-            <div className="h-10 w-20 bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-10 w-20 bg-gray-700 rounded animate-pulse"></div>
+      <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center p-8">
+        <div className="w-full max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl font-bold mb-12 shimmer-text">Мои проекты</h2>
+          <div className="space-y-6 w-full max-w-md mx-auto">
+            <div className="h-8 bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="h-32 bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="flex justify-center gap-6 mt-8">
+              <div className="h-12 w-24 bg-gray-700 rounded-lg animate-pulse"></div>
+              <div className="h-12 w-24 bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+            <p className="text-center text-gray-400 mt-6">
+              {retryCount > 0 ? `Повторная попытка ${retryCount}/2...` : 'Загрузка проектов...'}
+            </p>
           </div>
-          <p className="text-center text-gray-400">
-            {retryCount > 0 ? `Повторная попытка ${retryCount}/2...` : 'Загрузка проектов...'}
-          </p>
         </div>
       </section>
     );
@@ -138,60 +159,109 @@ const Projects = () => {
 
   if (error) {
     return (
-      <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-6">
-        <h2 className="text-4xl font-bold mb-8 shimmer-text">Мои проекты</h2>
-        <div className="text-center">
-          <div className="text-red-400 mb-4 max-w-md">{error}</div>
-          <button
-            onClick={handleRetry}
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            Попробовать снова
-          </button>
+      <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center p-8">
+        <div className="w-full max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl font-bold mb-12 shimmer-text">Мои проекты</h2>
+          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
+            <div className="text-red-400 mb-6">{error}</div>
+            <button
+              onClick={handleRetry}
+              className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 font-medium"
+            >
+              Попробовать снова
+            </button>
+          </div>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-4xl">
-        <h2 className="text-4xl font-bold mb-8 text-center shimmer-text">
+    <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center p-2 sm:p-4">
+      <div className="w-full max-w-4xl mx-auto text-center px-2">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 shimmer-text">
           Мои проекты
         </h2>
         
         <div className="flex flex-col items-center">
           {projects.length > 0 ? (
             <>
-              <ProjectCard
-                project={projects[current]}
-                onViewGithub={handleViewGithub}
-              />
+              <div className="relative w-full min-h-[300px] sm:min-h-[350px] flex items-center justify-center mb-4 sm:mb-6">
+                <AnimatePresence mode="wait" initial={false}>
+                  <ProjectCard
+                    key={current}
+                    project={projects[current]}
+                    onViewGithub={handleViewGithub}
+                    direction={direction}
+                  />
+                </AnimatePresence>
+              </div>
               
-              <div className="flex items-center gap-6 mt-8">
-                <button
+              <div className="flex items-center justify-center gap-4 sm:gap-6 w-full mt-2 sm:mt-4">
+                <m.button
                   onClick={handlePrev}
-                  className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+                  className="bg-blue-500/80 backdrop-blur-sm text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full hover:bg-blue-600 transition-all duration-300 flex items-center justify-center text-base sm:text-lg relative group"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  ←
-                </button>
-                <span className="text-lg">
-                  {current + 1} / {projects.length}
-                </span>
-                <button
+                  <m.div
+                    className="absolute inset-0 rounded-full bg-blue-400/20 group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <m.span
+                    className="relative"
+                    whileHover={{ x: -4 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 25
+                    }}
+                  >
+                    ←
+                  </m.span>
+                </m.button>
+                
+                <m.div 
+                  key={current}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-blue-500/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-white/90"
+                >
+                  <span className="text-base sm:text-lg font-medium">
+                    {current + 1} / {projects.length}
+                  </span>
+                </m.div>
+
+                <m.button
                   onClick={handleNext}
-                  className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+                  className="bg-blue-500/80 backdrop-blur-sm text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full hover:bg-blue-600 transition-all duration-300 flex items-center justify-center text-base sm:text-lg relative group"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  →
-                </button>
+                  <m.div
+                    className="absolute inset-0 rounded-full bg-blue-400/20 group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <m.span
+                    className="relative"
+                    whileHover={{ x: 4 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 25
+                    }}
+                  >
+                    →
+                  </m.span>
+                </m.button>
               </div>
             </>
           ) : (
-            <div className="text-center">
-              <p className="text-gray-400 mb-4">Проекты не найдены</p>
+            <div className="bg-[#2a2a2a] rounded-lg p-8 max-w-md mx-auto">
+              <p className="text-gray-400 mb-6 text-lg">Проекты не найдены</p>
               <button
                 onClick={handleRetry}
-                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+                className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 font-medium"
               >
                 Обновить
               </button>

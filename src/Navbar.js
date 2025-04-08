@@ -46,28 +46,28 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-[#1f1f1f] flex justify-between items-center px-4 py-2 z-50">
-      <button onClick={handleLogoClick} className="text-white text-2xl font-semibold hover:opacity-80 transition-opacity">
+    <nav className="fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg">
+      <button onClick={handleLogoClick} className="text-white text-2xl font-semibold hover:text-blue-400 transition-colors duration-300">
         Гамлет
       </button>
 
-      <div className="sm:hidden" onClick={toggleMenu}>
-        <div className="space-y-2">
-          <span className="block w-8 h-0.5 bg-white"></span>
-          <span className="block w-8 h-0.5 bg-white"></span>
-          <span className="block w-8 h-0.5 bg-white"></span>
+      <div className="sm:hidden relative z-50" onClick={toggleMenu}>
+        <div className="space-y-2 cursor-pointer">
+          <span className={`block w-8 h-0.5 bg-white transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></span>
+          <span className={`block w-8 h-0.5 bg-white transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}></span>
+          <span className={`block w-8 h-0.5 bg-white transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></span>
         </div>
       </div>
 
       <ul className={`${
-        menuOpen ? "block" : "hidden"
-      } sm:flex gap-8 text-white absolute sm:static top-16 left-0 w-full sm:w-auto bg-[#1f1f1f] sm:bg-transparent py-2`}>
+        menuOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
+      } fixed sm:relative top-0 left-0 h-screen sm:h-auto w-full sm:w-auto bg-[#1f1f1f]/95 sm:bg-transparent flex flex-col sm:flex-row items-center justify-center gap-8 text-white transition-transform duration-300 backdrop-blur-sm sm:backdrop-blur-none`}>
         {location.pathname === '/' && mainLinks.map(link => (
           <li key={link.id}>
             <a 
               href={`#${link.id}`}
               onClick={(e) => handleScroll(e, link.id)}
-              className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
+              className="text-lg hover:text-blue-400 transition-colors duration-300 py-2 sm:py-0 block px-4 sm:px-0"
             >
               {link.text}
             </a>
@@ -77,7 +77,7 @@ const Navbar = () => {
           <Link 
             to="/profile" 
             onClick={handleAuthClick}
-            className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
+            className="text-lg hover:text-blue-400 transition-colors duration-300 py-2 sm:py-0 block px-4 sm:px-0"
           >
             {user ? 'Профиль' : 'Авторизация'}
           </Link>
