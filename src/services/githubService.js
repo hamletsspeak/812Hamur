@@ -37,7 +37,6 @@ const cache = new Cache();
 
 export const getRepositories = async () => {
   try {
-    // Проверяем наличие кэшированных данных
     const cachedData = cache.get('repositories');
     if (cachedData) {
       console.log('Используются кэшированные данные');
@@ -46,11 +45,17 @@ export const getRepositories = async () => {
 
     console.log('Начинаем загрузку репозиториев...');
     
-    // Пробуем получить данные без авторизации
+    const headers = {
+      'Accept': 'application/vnd.github.v3+json'
+    };
+
+    // Добавляем токен только если он существует
+    if (process.env.REACT_APP_GITHUB_TOKEN) {
+      headers.Authorization = `token ${process.env.REACT_APP_GITHUB_TOKEN}`;
+    }
+
     const response = await axios.get(`${GITHUB_API_URL}/users/hamletsspeak/repos`, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json'
-      },
+      headers,
       timeout: 10000 // 10 секунд таймаут
     });
 
