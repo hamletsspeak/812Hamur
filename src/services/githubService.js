@@ -67,8 +67,7 @@ export const getRepositories = async () => {
           link: repo.html_url,
           stars: repo.stargazers_count,
           language: repo.language,
-          updatedAt: new Date(repo.updated_at),
-          description: repo.description || 'Нет описания'
+          updatedAt: new Date(repo.updated_at)
         }))
         .sort((a, b) => b.updatedAt - a.updatedAt);
 
