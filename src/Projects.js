@@ -1,36 +1,37 @@
 import React, { useState, useEffect } from 'react';
-
 import { motion, AnimatePresence } from "framer-motion";
-
-const projects = [
-  {
-    name: "Вёрстка сайта",
-    description: "Проект с 2 курса — точная вёрстка по макету.",
-    link: "https://github.com/hamletsspeak/hamletsspeak.github.io",
-  },
-  {
-    name: "Веб-приложение",
-    description: "Приложение на Ruby on Rails с REST API.",
-    link: "https://github.com/hamletsspeak/Rails-App",
-  },
-  {
-    name: "Сайт для магазина",
-    description: "Сайт-визитка для автозапчастей с контактами.",
-    link: "https://github.com/hamletsspeak/webparts",
-  },
-];
+import { getRepositories } from './services/githubService';
 
 const Projects = () => {
   const [current, setCurrent] = useState(0);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent(prev => (prev + 1) % projects.length);
-    }, 10000); // 10 секунд
-  
-    return () => clearInterval(interval);
+    const fetchProjects = async () => {
+      try {
+        const repos = await getRepositories();
+        setProjects(repos);
+        setLoading(false);
+      } catch (err) {
+        setError('Не удалось загрузить проекты');
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
   }, []);
-  
+
+  useEffect(() => {
+    if (projects.length > 0) {
+      const interval = setInterval(() => {
+        setCurrent(prev => (prev + 1) % projects.length);
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [projects.length]);
+
   const handleNext = () => {
     if (current < projects.length - 1) setCurrent(current + 1);
   };
@@ -38,6 +39,23 @@ const Projects = () => {
   const handlePrev = () => {
     if (current > 0) setCurrent(current - 1);
   };
+
+  if (loading) {
+    return (
+      <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-6">
+        <div className="animate-pulse">Загрузка проектов...</div>
+      </section>
+    );
+  }
+
+  if (error || projects.length === 0) {
+    return (
+      <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center px-6">
+        <h2 className="text-4xl font-bold mb-8 shimmer-text">Мои проекты</h2>
+        <div className="text-red-400">{error || 'Проекты не найдены'}</div>
+      </section>
+    );
+  }
 
   const project = projects[current];
 
@@ -59,6 +77,12 @@ const Projects = () => {
         >
           <h3 className="text-2xl font-bold">{project.name}</h3>
           <p className="mt-2">{project.description}</p>
+          {project.language && (
+            <p className="mt-2 text-blue-400">Технология: {project.language}</p>
+          )}
+          {project.stars > 0 && (
+            <p className="mt-2">⭐ {project.stars}</p>
+          )}
           <a
             href={project.link}
             target="_blank"
