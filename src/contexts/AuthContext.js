@@ -6,7 +6,9 @@ import {
   onAuthStateChanged,
   signInAnonymously,
   signInWithPhoneNumber,
-  signInWithPopup
+  signInWithPopup,
+  updateProfile,
+  updatePassword
 } from 'firebase/auth';
 import { auth, githubProvider } from '../firebase';
 
@@ -70,6 +72,32 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function updateUserProfile(data) {
+    if (!user) return;
+    
+    try {
+      await updateProfile(user, {
+        displayName: data.displayName,
+        photoURL: data.photoURL
+      });
+      
+      // Обновляем локальное состояние пользователя
+      setUser({ ...user });
+    } catch (error) {
+      throw new Error('Ошибка при обновлении профиля');
+    }
+  }
+
+  async function updateUserPassword(newPassword) {
+    if (!user) return;
+    
+    try {
+      await updatePassword(user, newPassword);
+    } catch (error) {
+      throw new Error('Ошибка при обновлении пароля');
+    }
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -87,7 +115,9 @@ export function AuthProvider({ children }) {
     loginAnonymously,
     setupRecaptcha,
     confirmPhoneCode,
-    loginWithGithub
+    loginWithGithub,
+    updateUserProfile,
+    updateUserPassword
   };
 
   return (
