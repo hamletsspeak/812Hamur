@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkmy_portfolio=self.webpackChunkmy_portfolio||[]).push([[913],{6913:(e,t,s)=>{s.r(t),s.d(t,{default:()=>o});s(5043);var a=s(579);const o=()=>(0,a.jsx)("footer",{className:"bg-gray-900 text-white text-center py-4",children:"\xa9 2025 hamletsspeak. \u0412\u0441\u0435 \u043f\u0440\u0430\u0432\u0430 \u0437\u0430\u0449\u0438\u0449\u0435\u043d\u044b."})}}]);
-//# sourceMappingURL=913.130bc89a.chunk.js.map
