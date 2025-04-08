@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
-import { getAuth, RecaptchaVerifier } from 'firebase/auth';
+import { RecaptchaVerifier } from 'firebase/auth';
 import { auth } from '../firebase';
 
 const Auth = () => {

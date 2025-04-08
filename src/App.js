@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { lazy } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './Navbar';
 import CursorLight from './CursorLight';
@@ -13,24 +13,7 @@ const About = lazy(() => import('./About'));
 const Projects = lazy(() => import('./Projects'));
 const Contact = lazy(() => import('./Contact'));
 const Footer = lazy(() => import('./Footer'));
-const Auth = lazy(() => import('./components/Auth'));
 const Profile = lazy(() => import('./Profile'));
-
-// Получаем basename из package.json homepage или используем '/'
-const basename = process.env.PUBLIC_URL || '/';
-
-const PageLoader = () => (
-  <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-    <div className="space-y-6 w-full max-w-md p-4">
-      <div className="h-8 bg-gray-700 rounded-lg animate-pulse"></div>
-      <div className="space-y-3">
-        <div className="h-4 bg-gray-700 rounded w-3/4 animate-pulse"></div>
-        <div className="h-4 bg-gray-700 rounded w-1/2 animate-pulse"></div>
-        <div className="h-4 bg-gray-700 rounded w-5/6 animate-pulse"></div>
-      </div>
-    </div>
-  </div>
-);
 
 function App() {
   return (

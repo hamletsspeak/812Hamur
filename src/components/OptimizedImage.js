@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
-import { createImagePlaceholder, preloadImage } from '../utils/imageUtils';
+import { preloadImage } from '../utils/imageUtils';
 
 const OptimizedImage = memo(({ src, alt, className, width = 400, height = 300 }) => {
   const [imageSrc, setImageSrc] = useState(null);
