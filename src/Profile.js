@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Auth from './components/Auth';
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -9,7 +10,7 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      // Не делаем навигацию после выхода
     } catch (err) {
       console.error('Ошибка при выходе:', err);
     }
@@ -20,7 +21,7 @@ const Profile = () => {
   };
 
   if (!user) {
-    return null;
+    return <Auth />;
   }
 
   return (

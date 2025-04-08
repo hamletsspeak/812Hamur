@@ -11,7 +11,17 @@ root.render(
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// Измеряем и отправляем метрики производительности
+reportWebVitals(metric => {
+  // Можно отправлять метрики в Google Analytics или другой сервис аналитики
+  console.log(metric);
+  
+  if (window.gtag) {
+    window.gtag('event', metric.name, {
+      value: Math.round(metric.value), // Округляем значение
+      metric_id: metric.id,
+      metric_value: metric.value,
+      metric_delta: metric.delta,
+    });
+  }
+});

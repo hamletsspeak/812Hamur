@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GithubAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCowSTE0Fo7SUsmfcijdlokWwqLZY7onkg",
@@ -9,7 +9,16 @@ const firebaseConfig = {
     messagingSenderId: "707128971063",
     appId: "1:707128971063:web:c5d92f2fb840f9843314b2",
     measurementId: "G-25B8TW7K5M"
-  };
+};
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const auth = getAuth(app);
+const githubProvider = new GithubAuthProvider();
+
+// Добавляем базовые области доступа для GitHub
+githubProvider.addScope('user');
+githubProvider.setCustomParameters({
+    'allow_signup': 'true'
+});
+
+export { auth, githubProvider };

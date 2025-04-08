@@ -12,11 +12,15 @@ const Navbar = () => {
 
   const handleScroll = (e, id) => {
     e.preventDefault();
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setMenuOpen(false);
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }
+    setMenuOpen(false);
   };
 
   const handleLogoClick = (e) => {
@@ -30,6 +34,16 @@ const Navbar = () => {
       document.getElementById('header')?.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const handleAuthClick = () => {
+    setMenuOpen(false);
+  };
+
+  const mainLinks = [
+    { id: 'about', text: 'Обо мне' },
+    { id: 'projects', text: 'Проекты' },
+    { id: 'contact', text: 'Контакты' }
+  ];
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-[#1f1f1f] flex justify-between items-center px-4 py-2 z-50">
@@ -48,50 +62,26 @@ const Navbar = () => {
       <ul className={`${
         menuOpen ? "block" : "hidden"
       } sm:flex gap-8 text-white absolute sm:static top-16 left-0 w-full sm:w-auto bg-[#1f1f1f] sm:bg-transparent py-2`}>
-        <li>
-          <a 
-            href="#about" 
-            onClick={(e) => handleScroll(e, 'about')}
-            className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
-          >
-            Обо мне
-          </a>
-        </li>
-        <li>
-          <a 
-            href="#projects" 
-            onClick={(e) => handleScroll(e, 'projects')}
-            className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
-          >
-            Проекты
-          </a>
-        </li>
-        <li>
-          <a 
-            href="#contact" 
-            onClick={(e) => handleScroll(e, 'contact')}
-            className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
-          >
-            Контакты
-          </a>
-        </li>
-        {user ? (
-          <li>
-            <Link to="/profile" className="hover:underline py-2 sm:py-0 block px-4 sm:px-0">
-              Профиль
-            </Link>
-          </li>
-        ) : (
-          <li>
+        {location.pathname === '/' && mainLinks.map(link => (
+          <li key={link.id}>
             <a 
-              href="#auth" 
-              onClick={(e) => handleScroll(e, 'auth')}
+              href={`#${link.id}`}
+              onClick={(e) => handleScroll(e, link.id)}
               className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
             >
-              Авторизация
+              {link.text}
             </a>
           </li>
-        )}
+        ))}
+        <li>
+          <Link 
+            to="/profile" 
+            onClick={handleAuthClick}
+            className="hover:underline py-2 sm:py-0 block px-4 sm:px-0"
+          >
+            {user ? 'Профиль' : 'Авторизация'}
+          </Link>
+        </li>
       </ul>
     </nav>
   );

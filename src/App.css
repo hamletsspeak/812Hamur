@@ -36,3 +36,36 @@
     transform: rotate(360deg);
   }
 }
+
+/* Стили для PhoneInput */
+.phone-input {
+  width: 100%;
+}
+
+.phone-input .selected-flag:hover,
+.phone-input .selected-flag:focus,
+.phone-input .selected-flag.open {
+  background-color: rgba(55, 65, 81, 1) !important;
+}
+
+.phone-input .country-list {
+  background-color: rgb(31, 31, 31) !important;
+  color: white !important;
+}
+
+.phone-input .country-list .country:hover {
+  background-color: rgba(55, 65, 81, 1) !important;
+}
+
+.phone-input .country-list .country.highlight {
+  background-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+.phone-input .country-list .divider {
+  border-bottom-color: rgba(75, 85, 99, 1) !important;
+}
+
+.phone-input .country-list .search {
+  background-color: rgb(31, 31, 31) !important;
+  border-color: rgba(75, 85, 99, 1) !important;
+}
