@@ -26,33 +26,30 @@ const Header = () => {
   const delta = 200;
 
   useEffect(() => {
-    let ticker = setInterval(() => {
-      tick();
-    }, delta);
+    const tick = () => {
+      let i = loopNum % greetings.length;
+      let fullText = greetings[i];
+      let updatedText = isDeleting 
+        ? fullText.substring(0, displayText.length - 1)
+        : fullText.substring(0, displayText.length + 1);
 
-    return () => clearInterval(ticker);
-  }, [displayText, isDeleting, loopNum]);
+      setDisplayText(updatedText);
 
-  const tick = () => {
-    let i = loopNum % greetings.length;
-    let fullText = greetings[i];
-    let updatedText = isDeleting 
-      ? fullText.substring(0, displayText.length - 1)
-      : fullText.substring(0, displayText.length + 1);
-
-    setDisplayText(updatedText);
-
-    if (isDeleting) {
-      if (updatedText === '') {
-        setIsDeleting(false);
-        setLoopNum(loopNum + 1);
+      if (isDeleting) {
+        if (updatedText === '') {
+          setIsDeleting(false);
+          setLoopNum(loopNum + 1);
+        }
+      } else if (updatedText === fullText) {
+        setTimeout(() => {
+          setIsDeleting(true);
+        }, period);
       }
-    } else if (updatedText === fullText) {
-      setTimeout(() => {
-        setIsDeleting(true);
-      }, period);
-    }
-  };
+    };
+
+    let ticker = setInterval(tick, delta);
+    return () => clearInterval(ticker);
+  }, [displayText, isDeleting, loopNum, greetings, period, delta]);
 
   return (
     <header id="header" className="snap-start min-h-screen bg-[#121212] flex flex-col items-center justify-center text-white text-center px-4">
