@@ -9,10 +9,21 @@ import { db } from '../firebase';
 
 export const saveUserData = async (userId, data) => {
   try {
-    await setDoc(doc(db, 'users', userId), {
+    const docRef = doc(db, 'users', userId);
+    
+    // Получаем текущие данные
+    const currentDoc = await getDoc(docRef);
+    const currentData = currentDoc.exists() ? currentDoc.data() : {};
+    
+    // Объединяем текущие данные с новыми
+    const updatedData = {
+      ...currentData,
       ...data,
       updatedAt: new Date().toISOString()
-    });
+    };
+
+    await setDoc(docRef, updatedData);
+    return updatedData;
   } catch (error) {
     console.error('Ошибка при сохранении данных пользователя:', error);
     throw new Error('Не удалось сохранить данные пользователя');
@@ -32,14 +43,24 @@ export const getUserData = async (userId) => {
 
 export const updateUserData = async (userId, data) => {
   try {
+    if (!userId) throw new Error('User ID is required');
+    
     const docRef = doc(db, 'users', userId);
-    await updateDoc(docRef, {
+    const timestamp = new Date().toISOString();
+    
+    const updateData = {
       ...data,
-      updatedAt: new Date().toISOString()
-    });
+      updatedAt: timestamp,
+      lastModified: timestamp
+    };
+
+    await updateDoc(docRef, updateData);
+    
+    // Возвращаем обновленные данные
+    return updateData;
   } catch (error) {
-    console.error('Ошибка при обновлении данных пользователя:', error);
-    throw new Error('Не удалось обновить данные пользователя');
+    console.error('Error updating user data:', error);
+    throw new Error('Failed to update user data');
   }
 };
 
@@ -76,4 +97,26 @@ export const subscribeToUserField = (userId, field, callback) => {
   });
 
   return unsubscribe;
+};
+
+export const updateUserAvatar = async (userId, avatarData) => {
+  try {
+    const docRef = doc(db, 'users', userId);
+    
+    await updateDoc(docRef, {
+      photoURL: avatarData.url,
+      avatar: {
+        url: avatarData.url,
+        publicId: avatarData.publicId,
+        width: avatarData.width,
+        height: avatarData.height,
+        updatedAt: new Date().toISOString()
+      }
+    });
+
+    return avatarData;
+  } catch (error) {
+    console.error('Ошибка при обновлении аватара:', error);
+    throw new Error('Не удалось обновить аватар в базе данных');
+  }
 };

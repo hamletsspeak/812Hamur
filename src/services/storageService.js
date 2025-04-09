@@ -1,9 +1,8 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth } from '../firebase';
+import { uploadImageToCloudinary } from './cloudinaryService';
+import { updateUserAvatar } from './databaseService';
 
-const storage = getStorage();
-
-const compressImage = async (file) => {
+// Оптимизация изображения перед загрузкой
+const optimizeImage = (file) => {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -12,19 +11,20 @@ const compressImage = async (file) => {
       img.src = e.target.result;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_SIZE = 800; // максимальный размер стороны изображения
+        const MAX_WIDTH = 500;
+        const MAX_HEIGHT = 500;
         let width = img.width;
         let height = img.height;
 
         if (width > height) {
-          if (width > MAX_SIZE) {
-            height *= MAX_SIZE / width;
-            width = MAX_SIZE;
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
           }
         } else {
-          if (height > MAX_SIZE) {
-            width *= MAX_SIZE / height;
-            height = MAX_SIZE;
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
           }
         }
 
@@ -32,33 +32,33 @@ const compressImage = async (file) => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-          resolve(new File([blob], file.name, {
-            type: 'image/jpeg',
-            lastModified: Date.now()
-          }));
-        }, 'image/jpeg', 0.8); // качество 0.8
+        
+        canvas.toBlob(
+          (blob) => {
+            resolve(new File([blob], file.name, { 
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            })); 
+          }, 
+          'image/jpeg', 
+          0.7
+        );
       };
     };
   });
 };
 
-export const uploadUserAvatar = async (file) => {
-  if (!auth.currentUser) {
-    throw new Error('Пользователь не авторизован');
-  }
-
+export const uploadUserAvatar = async (userId, file) => {
   try {
-    // Оптимизируем изображение перед загрузкой
-    const optimizedFile = await compressImage(file);
+    // Загружаем в Cloudinary
+    const cloudinaryResult = await uploadImageToCloudinary(file, userId);
     
-    const fileRef = ref(storage, `avatars/${auth.currentUser.uid}/${file.name}`);
-    const snapshot = await uploadBytes(fileRef, optimizedFile);
-    const downloadURL = await getDownloadURL(snapshot.ref);
-    return downloadURL;
+    // Сохраняем информацию в базе данных
+    const result = await updateUserAvatar(userId, cloudinaryResult);
+    
+    return result.url;
   } catch (error) {
-    console.error('Ошибка при загрузке файла:', error);
-    throw new Error('Ошибка при загрузке аватара');
+    console.error('Ошибка при загрузке аватара:', error);
+    throw error;
   }
 };

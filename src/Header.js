@@ -26,6 +26,8 @@ const Header = () => {
   const delta = 200;
 
   useEffect(() => {
+    let ticker = null;
+    
     const tick = () => {
       let i = loopNum % greetings.length;
       let fullText = greetings[i];
@@ -35,19 +37,15 @@ const Header = () => {
 
       setDisplayText(updatedText);
 
-      if (isDeleting) {
-        if (updatedText === '') {
-          setIsDeleting(false);
-          setLoopNum(loopNum + 1);
-        }
-      } else if (updatedText === fullText) {
-        setTimeout(() => {
-          setIsDeleting(true);
-        }, period);
+      if (!isDeleting && updatedText === fullText) {
+        setTimeout(() => setIsDeleting(true), period);
+      } else if (isDeleting && updatedText === '') {
+        setIsDeleting(false);
+        setLoopNum(prev => prev + 1);
       }
     };
 
-    let ticker = setInterval(tick, delta);
+    ticker = setInterval(tick, delta);
     return () => clearInterval(ticker);
   }, [displayText, isDeleting, loopNum, greetings, period, delta]);
 

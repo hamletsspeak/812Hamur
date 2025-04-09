@@ -22,6 +22,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [confirmationResult, setConfirmationResult] = useState(null);
 
   async function signup(email, password) {
@@ -144,31 +145,34 @@ export function AuthProvider({ children }) {
   }
 
   async function updateUserProfile(data) {
-    if (!user) return;
+    if (!user) throw new Error('Пользователь не авторизован');
     
     try {
-      // Сначала обновляем Firebase Auth
+      // Обновляем базовые поля в Firebase Auth
       await updateProfile(user, {
         displayName: data.displayName,
         photoURL: data.photoURL
       });
       
-      // Создаем обновленный объект пользователя
+      // Сохраняем расширенные данные в Firestore
+      const savedData = await saveUserData(user.uid, {
+        displayName: data.displayName,
+        photoURL: data.photoURL,
+        about: data.about,
+        skills: data.skills,
+        email: data.email,
+        updatedAt: new Date().toISOString()
+      });
+
+      // Обновляем локальное состояние пользователя
       const updatedUser = {
         ...user,
         displayName: data.displayName,
-        photoURL: data.photoURL
+        photoURL: data.photoURL,
+        additionalData: savedData
       };
       
-      // Обновляем локальное состояние
       setUser(updatedUser);
-      
-      // Затем обновляем Firestore
-      await updateUserData(user.uid, {
-        ...data,
-        updatedAt: new Date().toISOString()
-      });
-      
       return updatedUser;
     } catch (error) {
       console.error('Ошибка при обновлении профиля:', error);
@@ -192,19 +196,22 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        // При входе загружаем дополнительные данные пользователя из Firestore
-        try {
+      try {
+        if (currentUser) {
           const userData = await getUserData(currentUser.uid);
           if (userData) {
             currentUser.additionalData = userData;
           }
-        } catch (error) {
-          console.error('Ошибка при загрузке данных пользователя:', error);
+          setUser(currentUser);
+        } else {
+          setUser(null);
         }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
-      setUser(currentUser);
-      setLoading(false);
     });
 
     return unsubscribe;

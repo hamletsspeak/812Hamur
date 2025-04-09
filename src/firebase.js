@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GithubAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCowSTE0Fo7SUsmfcijdlokWwqLZY7onkg",
@@ -15,14 +16,19 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+if (!app) {
+  throw new Error('Failed to initialize Firebase');
+}
+
 const auth = getAuth(app);
 const database = getDatabase(app);
 const db = getFirestore(app);
 const githubProvider = new GithubAuthProvider();
+const storage = getStorage(app);
 
 githubProvider.addScope('user');
 githubProvider.setCustomParameters({
     'allow_signup': 'true'
 });
 
-export { auth, database, db, githubProvider };
+export { auth, database, db, githubProvider, storage };

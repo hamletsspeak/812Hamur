@@ -4,6 +4,8 @@
   "homepage": "https://hamletsspeak.github.io/my-portfolio",
   "private": true,
   "dependencies": {
+    "@cloudinary/react": "^1.11.2",
+    "@cloudinary/url-gen": "^1.14.0",
     "@firebase/auth": "^1.10.0",
     "@firebase/database": "^1.0.14",
     "@testing-library/dom": "^10.4.0",

@@ -12,8 +12,8 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
     displayName: user?.displayName || '',
-    about: '',
-    skills: []
+    about: user?.additionalData?.about || '',
+    skills: user?.additionalData?.skills || []
   });
   const [userData, setUserData] = useState(null);
   const [newPassword, setNewPassword] = useState('');
@@ -71,12 +71,23 @@ const Profile = () => {
 
   const handleSaveProfile = async () => {
     try {
+      // Сохраняем все поля включая about и skills
       await updateUserProfile({
         displayName: userInfo.displayName,
         photoURL: user.photoURL,
         about: userInfo.about,
-        skills: userInfo.skills
+        skills: userInfo.skills,
+        email: user.email,
       });
+
+      // Обновляем локальное состояние
+      setUserData(prev => ({
+        ...prev,
+        displayName: userInfo.displayName,
+        about: userInfo.about,
+        skills: userInfo.skills
+      }));
+
       showToast('Профиль успешно обновлен');
       setIsEditing(false);
     } catch (err) {
@@ -105,36 +116,23 @@ const Profile = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      try {
-        setIsAvatarLoading(true);
-        
-        // Проверяем размер файла (не более 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          showToast('Размер файла не должен превышать 5MB', 'error');
-          return;
-        }
-        
-        const photoURL = await uploadUserAvatar(file);
-        const updatedUser = await updateUserProfile({
-          ...userInfo,
-          photoURL
-        });
-        
-        // Обновляем UI только если обновление успешно
-        if (updatedUser) {
-          setUserInfo(prev => ({
-            ...prev,
-            photoURL: updatedUser.photoURL
-          }));
-          showToast('Аватар успешно обновлен');
-        }
-      } catch (err) {
-        showToast('Ошибка при загрузке аватара', 'error');
-        console.error(err);
-      } finally {
-        setIsAvatarLoading(false);
-      }
+    if (!file) return;
+
+    try {
+      setIsAvatarLoading(true);
+      const photoURL = await uploadUserAvatar(user.uid, file);
+      
+      await updateUserProfile({
+        ...userInfo,
+        photoURL
+      });
+
+      showToast('Аватар успешно обновлен');
+    } catch (err) {
+      console.error('Ошибка при загрузке аватара:', err);
+      showToast(err.message || 'Ошибка при загрузке аватара', 'error');
+    } finally {
+      setIsAvatarLoading(false);
     }
   };
 
@@ -172,7 +170,7 @@ const Profile = () => {
                   <>
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938л3-2.647z" />
                     </svg>
                     Выход...
                   </>
@@ -197,7 +195,7 @@ const Profile = () => {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <svg className="animate-spin h-8 w-8 text-white" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938л3-2.647z" />
                     </svg>
                   </div>
                 )}
