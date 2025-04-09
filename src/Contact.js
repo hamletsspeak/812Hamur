@@ -3,7 +3,7 @@ import { m } from "framer-motion";
 import OptimizedImage from './components/OptimizedImage';
 import gmailIconPath from './icons/gmail-icon.png';
 import telegramIconPath from './icons/telegram-icon.png';
-import { fadeInFromLeftVariant, zoomRotateVariant, useScrollAnimation } from './config/animations';
+import {zoomRotateVariant, useScrollAnimation } from './config/animations';
 
 const ContactLink = memo(({ href, icon, alt, text }) => (
   <m.a
