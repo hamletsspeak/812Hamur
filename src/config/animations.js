@@ -43,6 +43,43 @@ export const scaleUpVariant = {
   }
 };
 
+export const fadeInFromLeftVariant = {
+  hidden: { opacity: 0, x: -50 },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    transition: {
+      ...baseTransition,
+      type: "spring"
+    }
+  }
+};
+
+export const fadeInFromRightVariant = {
+  hidden: { opacity: 0, x: 50 },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    transition: {
+      ...baseTransition,
+      type: "spring"
+    }
+  }
+};
+
+export const zoomRotateVariant = {
+  hidden: { opacity: 0, scale: 0.7, rotate: -10 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    rotate: 0,
+    transition: {
+      ...baseTransition,
+      type: "spring"
+    }
+  }
+};
+
 export { m, AnimatePresence };
 
 // Оптимизированный провайдер анимаций с поддержкой reducedMotion
@@ -51,3 +88,12 @@ export const AnimationProvider = ({ children }) => (
     {children}
   </LazyMotion>
 );
+
+// Хук для определения видимости элемента
+export const useScrollAnimation = (threshold = 0.1) => {
+  return {
+    initial: "hidden",
+    whileInView: "visible",
+    viewport: { once: true, amount: threshold }
+  };
+};

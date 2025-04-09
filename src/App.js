@@ -5,6 +5,7 @@ import CursorLight from './CursorLight';
 import { AuthProvider } from './contexts/AuthContext';
 import { AnimationProvider } from './config/animations';
 import CachedRoute from './components/CachedRoute';
+import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
 // Lazy load components
@@ -26,9 +27,11 @@ function App() {
             <Routes>
               <Route path="/profile" element={
                 <CachedRoute>
-                  <div className="pt-16">
-                    <Profile />
-                  </div>
+                  <ProtectedRoute>
+                    <div className="pt-16">
+                      <Profile />
+                    </div>
+                  </ProtectedRoute>
                 </CachedRoute>
               } />
               <Route path="/" element={

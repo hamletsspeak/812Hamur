@@ -139,7 +139,7 @@ const Profile = () => {
   };
 
   if (!user) {
-    return <Auth />;
+    return <Auth isOpen={true} onClose={() => navigate('/')} />;
   }
 
   return (
