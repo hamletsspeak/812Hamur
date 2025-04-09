@@ -22,7 +22,6 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [confirmationResult, setConfirmationResult] = useState(null);
 
   async function signup(email, password) {
@@ -208,7 +207,6 @@ export function AuthProvider({ children }) {
         }
       } catch (error) {
         console.error('Error loading user data:', error);
-        setError(error.message);
       } finally {
         setLoading(false);
       }
