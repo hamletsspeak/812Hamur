@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "./contexts/AuthContext";
 
 const Header = () => {
@@ -7,7 +7,7 @@ const Header = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
   
-  const greetings = [
+  const greetings = useMemo(() => [
     "HELLO WORLD!", // English
     "ПРИВЕТ МИР!", // Russian
     "¡HOLA MUNDO!", // Spanish
@@ -20,7 +20,7 @@ const Header = () => {
     "MERHABA DÜNYA!", // Turkish
     "ΓΕΙΑ ΣΟΥ ΚΟΣΜΕ!", // Greek
     "世界你好！" // Chinese
-  ];
+  ], []);
 
   const period = 2000;
   const delta = 200;
