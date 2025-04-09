@@ -117,6 +117,7 @@ const Navbar = () => {
           Гамлет
         </m.button>
 
+
         <div className="sm:hidden relative z-50">
           <m.button
             onClick={toggleMenu}
