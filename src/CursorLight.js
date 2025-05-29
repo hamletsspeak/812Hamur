@@ -24,6 +24,11 @@ const CursorLight = memo(() => {
     return () => window.removeEventListener('mousemove', handler);
   }, []);
 
+  // Не показывать свечение на мобильных
+  if (typeof window !== 'undefined' && window.innerWidth <= 640) {
+    return null;
+  }
+
   return (
     <div
       style={{

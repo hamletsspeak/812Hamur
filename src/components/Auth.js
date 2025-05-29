@@ -117,14 +117,15 @@ const Auth = ({ isOpen, onClose }) => {
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isOpen && (
         <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleOverlayClick}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-200"
+          style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
         >
           <m.div
             initial={{ scale: 0.9, opacity: 0 }}

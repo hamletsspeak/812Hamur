@@ -8,7 +8,10 @@ const baseTransition = {
   duration: 0.25
 };
 
-export const slideUpVariant = {
+// Флаг для отключения анимаций на мобильных
+const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640;
+
+export const slideUpVariant = isMobile ? {} : {
   hidden: { opacity: 0, y: 20 },
   visible: { 
     opacity: 1, 
@@ -20,7 +23,7 @@ export const slideUpVariant = {
   }
 };
 
-export const fadeInVariant = {
+export const fadeInVariant = isMobile ? {} : {
   hidden: { opacity: 0 },
   visible: { 
     opacity: 1,
@@ -31,7 +34,7 @@ export const fadeInVariant = {
   }
 };
 
-export const scaleUpVariant = {
+export const scaleUpVariant = isMobile ? {} : {
   hidden: { opacity: 0, scale: 0.95 },
   visible: { 
     opacity: 1, 
@@ -43,7 +46,7 @@ export const scaleUpVariant = {
   }
 };
 
-export const fadeInFromLeftVariant = {
+export const fadeInFromLeftVariant = isMobile ? {} : {
   hidden: { opacity: 0, x: -50 },
   visible: { 
     opacity: 1, 
@@ -55,7 +58,7 @@ export const fadeInFromLeftVariant = {
   }
 };
 
-export const fadeInFromRightVariant = {
+export const fadeInFromRightVariant = isMobile ? {} : {
   hidden: { opacity: 0, x: 50 },
   visible: { 
     opacity: 1, 
@@ -67,7 +70,7 @@ export const fadeInFromRightVariant = {
   }
 };
 
-export const zoomRotateVariant = {
+export const zoomRotateVariant = isMobile ? {} : {
   hidden: { opacity: 0, scale: 0.7, rotate: -10 },
   visible: { 
     opacity: 1, 
