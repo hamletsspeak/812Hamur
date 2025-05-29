@@ -69,10 +69,9 @@ const Profile = () => {
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
-  };
-
-  const hideToast = () => {
-    setToast({ show: false, message: '', type: 'success' });
+    setTimeout(() => {
+      setToast({ show: false, message: '', type: 'success' });
+    }, 1000);
   };
 
   const handleLogout = async () => {
@@ -152,7 +151,7 @@ const Profile = () => {
             <Toast 
               message={toast.message} 
               type={toast.type} 
-              onClose={hideToast}
+              onClose={() => setToast({ show: false, message: '', type: 'success' })}
             />
           </div>
         )}

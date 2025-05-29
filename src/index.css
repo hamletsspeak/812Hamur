@@ -104,3 +104,7 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+.transition-opacity {
+  transition: opacity 0.3s ease;
+}
