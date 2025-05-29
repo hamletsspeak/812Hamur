@@ -91,9 +91,9 @@ const Navbar = () => {
   };
 
   const mainLinks = [
-    { id: 'about', text: 'Обо мне' },
-    { id: 'projects', text: 'Проекты' },
-    { id: 'contact', text: 'Контакты' }
+    { id: 'about', text: 'About' },
+    { id: 'projects', text: 'Projects' },
+    { id: 'contact', text: 'Contact' }
   ];
 
   return (
@@ -106,7 +106,7 @@ const Navbar = () => {
           stiffness: 300,
           damping: 30
         }}
-        className="fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg"
+        className="fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg navbar-font"
       >
         <m.button 
           onClick={handleLogoClick} 
@@ -114,7 +114,7 @@ const Navbar = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Гамлет
+          Hamlet
         </m.button>
 
 
@@ -189,7 +189,7 @@ const Navbar = () => {
                     className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400"
                     style={{ display: 'block' }}
                   />
-                  {user ? 'Личный кабинет' : 'Регистрация/Авторизация'}
+                  {user ? 'Profile' : 'Sign In / Register'}
                 </button>
               </m.li>
             </m.ul>

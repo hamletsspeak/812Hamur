@@ -13,8 +13,19 @@ html {
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Minecraft";
+  src: url("./fonts/minecraft_0.ttf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  font-family: "Daneehand_Regular_Cyr", sans-serif;
+  font-family: 'Montserrat', 'Daneehand_Regular_Cyr', sans-serif;
+}
+
+.navbar-font {
+  font-family: 'Minecraft', cursive, sans-serif !important;
 }
 
 @keyframes shimmer-glow {
@@ -107,4 +118,17 @@ body {
 
 .transition-opacity {
   transition: opacity 0.3s ease;
+}
+
+@media (max-width: 640px) {
+  .backdrop-blur-sm, .backdrop-blur, .backdrop-blur-lg {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .shadow-lg, .shadow-xl, .shadow-2xl {
+    box-shadow: none !important;
+  }
+  .will-change-transform {
+    will-change: auto !important;
+  }
 }

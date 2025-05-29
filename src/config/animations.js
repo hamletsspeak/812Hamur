@@ -2,10 +2,10 @@ import { m, domAnimation, LazyMotion, AnimatePresence } from "framer-motion";
 
 // Базовые настройки для всех анимаций
 const baseTransition = {
-  type: "spring",
-  damping: 20,
-  stiffness: 300,
-  duration: 0.3
+  type: typeof window !== 'undefined' && window.innerWidth <= 640 ? "tween" : "spring",
+  damping: 18,
+  stiffness: 180,
+  duration: 0.25
 };
 
 export const slideUpVariant = {
