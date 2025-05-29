@@ -10,7 +10,6 @@ import LocationAutocomplete from './components/LocationAutocomplete';
 const Profile = () => {
   const { user, logout, updateUserProfile } = useAuth();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
     fullName: '',
     phone: '',
@@ -81,7 +80,6 @@ const Profile = () => {
     try {
       await updateUserProfile(userInfo);
       showToast('Профиль успешно обновлен');
-      setIsEditing(false);
     } catch (err) {
       console.error('Ошибка при обновлении профиля:', err);
       setProfileError(err.message || String(err));
