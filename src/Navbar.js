@@ -172,12 +172,26 @@ const Navbar = () => {
                   {link.text}
                 </NavLink>
               ))}
-              <NavLink
-                to={user ? "/profile" : "#"}
-                onClick={handleAuthClick}
+              <m.li
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                {user ? 'Профиль' : 'Войти'}
-              </NavLink>
+                <button
+                  onClick={handleAuthClick}
+                  className="text-lg text-white hover:text-blue-400 transition-colors duration-300 py-2 sm:py-0 block px-4 sm:px-0 relative"
+                  style={{ background: 'none', border: 'none', outline: 'none', cursor: 'pointer' }}
+                  type="button"
+                >
+                  <span
+                    className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400"
+                    style={{ display: 'block' }}
+                  />
+                  {user ? 'Личный кабинет' : 'Регистрация/Авторизация'}
+                </button>
+              </m.li>
             </m.ul>
           )}
         </AnimatePresence>

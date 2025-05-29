@@ -4,11 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  signInAnonymously,
-  signInWithPhoneNumber,
   signInWithPopup,
-  updateProfile,
-  updatePassword
+  updateProfile as updateFirebaseProfile
 } from 'firebase/auth';
 import { auth, githubProvider } from '../firebase';
 import { saveUserData, getUserData, updateUserData } from '../services/databaseService';
@@ -22,7 +19,6 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [confirmationResult, setConfirmationResult] = useState(null);
 
   async function signup(email, password) {
     try {
@@ -30,8 +26,13 @@ export function AuthProvider({ children }) {
       // Сохраняем начальные данные пользователя
       await saveUserData(result.user.uid, {
         email: result.user.email,
-        displayName: result.user.displayName || '',
-        photoURL: result.user.photoURL || '',
+        displayName: '',
+        photoURL: '',
+        bio: '',
+        location: '',
+        skills: '',
+        github: '',
+        website: '',
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString()
       });
@@ -57,27 +58,20 @@ export function AuthProvider({ children }) {
   async function loginWithGithub() {
     try {
       const result = await signInWithPopup(auth, githubProvider);
+      const isNewUser = result.additionalUserInfo.isNewUser;
+      
       // Сохраняем/обновляем данные пользователя GitHub
       await saveUserData(result.user.uid, {
         email: result.user.email,
         displayName: result.user.displayName || '',
         photoURL: result.user.photoURL || '',
         githubProfile: true,
-        lastLogin: new Date().toISOString()
-      });
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async function loginAnonymously() {
-    try {
-      const result = await signInAnonymously(auth);
-      // Сохраняем данные анонимного пользователя
-      await saveUserData(result.user.uid, {
-        isAnonymous: true,
-        createdAt: new Date().toISOString(),
+        bio: '',
+        location: '',
+        skills: '',
+        github: result.additionalUserInfo?.profile?.html_url || '',
+        website: result.additionalUserInfo?.profile?.blog || '',
+        createdAt: isNewUser ? new Date().toISOString() : undefined,
         lastLogin: new Date().toISOString()
       });
       return result;
@@ -90,126 +84,66 @@ export function AuthProvider({ children }) {
     try {
       if (!user) return;
       
-      // Сначала обновляем данные о выходе в Firestore
+      // Обновляем данные о выходе в Firestore
       try {
         await updateUserData(user.uid, {
           lastLogout: new Date().toISOString()
         });
       } catch (error) {
         console.error('Ошибка при обновлении времени выхода:', error);
-        // Продолжаем процесс выхода даже если не удалось обновить время
       }
-
-      // Затем выполняем выход из Firebase Auth
-      await signOut(auth);
       
-      // Очищаем локальные данные пользователя после успешного выхода
-      setUser(null);
+      await signOut(auth);
     } catch (error) {
-      console.error('Ошибка при выходе:', error);
-      throw new Error('Не удалось выполнить выход из системы');
-    }
-  }
-
-  async function setupRecaptcha(phoneNumber, appVerifier) {
-    try {
-      const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
-      console.log('Attempting phone sign in with:', formattedPhone);
-      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-      setConfirmationResult(confirmation);
-      return confirmation;
-    } catch (error) {
-      console.error('Error in setupRecaptcha:', error);
       throw error;
     }
   }
 
-  async function confirmPhoneCode(code) {
-    try {
-      if (!confirmationResult) {
-        throw new Error('Сначала необходимо отправить код подтверждения');
-      }
-      const result = await confirmationResult.confirm(code);
-      // Сохраняем данные пользователя, вошедшего по телефону
-      await saveUserData(result.user.uid, {
-        phoneNumber: result.user.phoneNumber,
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString()
-      });
-      return result;
-    } catch (error) {
-      console.error('Error in confirmPhoneCode:', error);
-      throw error;
-    }
-  }
+  async function updateUserProfile(profileData) {
+    if (!auth.currentUser) throw new Error('Пользователь не авторизован');
 
-  async function updateUserProfile(data) {
-    if (!user) throw new Error('Пользователь не авторизован');
-    
     try {
       // Обновляем базовые поля в Firebase Auth
-      await updateProfile(user, {
-        displayName: data.displayName,
-        photoURL: data.photoURL
-      });
-      
-      // Сохраняем расширенные данные в Firestore
-      const savedData = await saveUserData(user.uid, {
-        displayName: data.displayName,
-        photoURL: data.photoURL,
-        about: data.about,
-        skills: data.skills,
-        email: data.email,
+      const authUpdate = {
+        displayName: profileData.displayName
+      };
+      if (profileData.photoURL) {
+        authUpdate.photoURL = profileData.photoURL;
+      }
+      await updateFirebaseProfile(auth.currentUser, authUpdate);
+
+      // Обновляем расширенные данные в Firestore
+      await updateUserData(auth.currentUser.uid, {
+        ...profileData,
         updatedAt: new Date().toISOString()
       });
 
       // Обновляем локальное состояние пользователя
-      const updatedUser = {
-        ...user,
-        displayName: data.displayName,
-        photoURL: data.photoURL,
-        additionalData: savedData
-      };
-      
-      setUser(updatedUser);
-      return updatedUser;
-    } catch (error) {
-      console.error('Ошибка при обновлении профиля:', error);
-      throw new Error('Ошибка при обновлении профиля');
-    }
-  }
-
-  async function updateUserPassword(newPassword) {
-    if (!user) return;
-    
-    try {
-      await updatePassword(user, newPassword);
-      // Записываем в базу время последнего обновления пароля
-      await updateUserData(user.uid, {
-        passwordLastUpdated: new Date().toISOString()
+      const updatedUser = auth.currentUser;
+      const userData = await getUserData(auth.currentUser.uid);
+      setUser({
+        ...updatedUser,
+        ...userData
       });
     } catch (error) {
-      throw new Error('Ошибка при обновлении пароля');
+      throw error;
     }
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      try {
-        if (currentUser) {
-          const userData = await getUserData(currentUser.uid);
-          if (userData) {
-            currentUser.additionalData = userData;
-          }
-          setUser(currentUser);
-        } else {
-          setUser(null);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userData = await getUserData(user.uid);
+          setUser({ ...user, ...userData });
+        } catch (error) {
+          console.error('Ошибка при получении данных пользователя:', error);
+          setUser(user);
         }
-      } catch (error) {
-        console.error('Error loading user data:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        setUser(null);
       }
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -220,21 +154,15 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
-    loginAnonymously,
-    setupRecaptcha,
-    confirmPhoneCode,
     loginWithGithub,
-    updateUserProfile,
-    updateUserPassword
+    updateUserProfile
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading ? children : (
-        <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-          <div className="text-white text-xl">Загрузка...</div>
-        </div>
-      )}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
+
+export default AuthContext;

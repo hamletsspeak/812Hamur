@@ -1,29 +1,28 @@
-import React, { useEffect, useState, useCallback, memo } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
+
+// Вынесенная функция throttle
+function throttle(func, limit) {
+  let inThrottle = false;
+  return function (...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}
 
 const CursorLight = memo(() => {
   const [pos, setPos] = useState({ x: -1000, y: -1000 });
-
-  const handleMouseMove = useCallback((e) => {
-    const throttle = (func, limit) => {
-      let inThrottle;
-      return function(...args) {
-        if (!inThrottle) {
-          func.apply(this, args);
-          inThrottle = true;
-          setTimeout(() => inThrottle = false, limit);
-        }
-      }
-    };
-    
-    throttle(() => {
-      setPos({ x: e.clientX, y: e.clientY });
-    }, 16)();
-  }, []);
+  const throttledSetPos = useRef(throttle((e) => {
+    setPos({ x: e.clientX, y: e.clientY });
+  }, 16));
 
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+    const handler = throttledSetPos.current;
+    window.addEventListener('mousemove', handler);
+    return () => window.removeEventListener('mousemove', handler);
+  }, []);
 
   return (
     <div

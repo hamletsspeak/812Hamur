@@ -1,20 +1,22 @@
-import React, { lazy } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './Navbar';
-import CursorLight from './CursorLight';
-import { AuthProvider } from './contexts/AuthContext';
-import { AnimationProvider } from './config/animations';
-import CachedRoute from './components/CachedRoute';
-import ProtectedRoute from './components/ProtectedRoute';
-import './index.css';
+import React, { lazy } from "react";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./Navbar";
+import CursorLight from "./CursorLight";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AnimationProvider } from "./config/animations";
+import CachedRoute from "./components/CachedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+import "./index.css";
 
 // Lazy load components
-const Header = lazy(() => import('./Header'));
-const About = lazy(() => import('./About'));
-const Projects = lazy(() => import('./Projects'));
-const Contact = lazy(() => import('./Contact'));
-const Footer = lazy(() => import('./Footer'));
-const Profile = lazy(() => import('./Profile'));
+const Header = lazy(() => import("./Header"));
+const About = lazy(() => import("./About"));
+const Projects = lazy(() => import("./Projects"));
+const Contact = lazy(() => import("./Contact"));
+const Footer = lazy(() => import("./Footer"));
+const Profile = lazy(() => import("./Profile"));
+const Match3Game = lazy(() => import("./components/Match3Game"));
+const ProfileSetup = lazy(() => import("./components/ProfileSetup"));
 
 function App() {
   return (
@@ -25,26 +27,54 @@ function App() {
             <CursorLight />
             <Navbar />
             <Routes>
-              <Route path="/profile" element={
-                <CachedRoute>
-                  <ProtectedRoute>
+              <Route
+                path="/profile"
+                element={
+                  <CachedRoute>
+                    <ProtectedRoute>
+                      <div className="pt-16">
+                        <Profile />
+                      </div>
+                    </ProtectedRoute>
+                  </CachedRoute>
+                }
+              />
+              <Route
+                path="/game"
+                element={
+                  <CachedRoute>
                     <div className="pt-16">
-                      <Profile />
+                      <Match3Game />
                     </div>
-                  </ProtectedRoute>
-                </CachedRoute>
-              } />
-              <Route path="/" element={
-                <CachedRoute>
-                  <main className="h-screen snap-y snap-mandatory overflow-y-auto scroll-pt-16">
-                    <Header />
-                    <About />
-                    <Projects />
-                    <Contact />
-                    <Footer />
-                  </main>
-                </CachedRoute>
-              } />
+                  </CachedRoute>
+                }
+              />
+              <Route
+                path="/profile-setup"
+                element={
+                  <CachedRoute>
+                    <ProtectedRoute>
+                      <div className="pt-16">
+                        <ProfileSetup />
+                      </div>
+                    </ProtectedRoute>
+                  </CachedRoute>
+                }
+              />
+              <Route
+                path="/"
+                element={
+                  <CachedRoute>
+                    <main className="h-screen snap-y snap-mandatory overflow-y-auto scroll-pt-16">
+                      <Header />
+                      <About />
+                      <Projects />
+                      <Contact />
+                      <Footer />
+                    </main>
+                  </CachedRoute>
+                }
+              />
             </Routes>
           </div>
         </Router>
