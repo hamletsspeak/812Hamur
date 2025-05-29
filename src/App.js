@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, useEffect } from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Navbar";
 import CursorLight from "./CursorLight";
@@ -6,6 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AnimationProvider } from "./config/animations";
 import CachedRoute from "./components/CachedRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CookieConsent from "./components/CookieConsent";
 import "./index.css";
 
 // Lazy load components
@@ -19,6 +20,28 @@ const Match3Game = lazy(() => import("./components/Match3Game"));
 const ProfileSetup = lazy(() => import("./components/ProfileSetup"));
 
 function App() {
+  useEffect(() => {
+    if (!localStorage.getItem("userLocation")) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = {
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+            };
+            localStorage.setItem("userLocation", JSON.stringify(coords));
+          },
+          (err) => {
+            localStorage.setItem("userLocation", "denied");
+          },
+          { enableHighAccuracy: false, timeout: 10000 }
+        );
+      } else {
+        localStorage.setItem("userLocation", "unsupported");
+      }
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <AnimationProvider>
@@ -76,6 +99,7 @@ function App() {
                 }
               />
             </Routes>
+            <CookieConsent />
           </div>
         </Router>
       </AnimationProvider>

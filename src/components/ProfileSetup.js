@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './LocationAutocomplete';
+import { getCityByCoords } from '../utils/geoUtils';
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
@@ -20,6 +21,63 @@ const ProfileSetup = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!formData.location && typeof window !== 'undefined') {
+      const loc = localStorage.getItem('userLocation');
+      if (loc && loc !== 'denied' && loc !== 'unsupported') {
+        try {
+          const { lat, lon } = JSON.parse(loc);
+          getCityByCoords(lat, lon).then(city => {
+            if (city) setFormData(prev => ({ ...prev, location: city }));
+          });
+        } catch {}
+      }
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // Валидация профиля
+  function validateProfile(data) {
+    const errors = {};
+    if (!data.fullName || data.fullName.trim().length < 3) {
+      errors.fullName = 'Введите корректное ФИО (минимум 3 символа)';
+    }
+    if (!/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(data.phone)) {
+      errors.phone = 'Введите телефон в формате +7 (XXX) XXX-XX-XX';
+    }
+    if (!user?.email || !/^\S+@\S+\.\S+$/.test(user.email)) {
+      errors.email = 'Некорректный email';
+    }
+    if (!data.location || data.location.trim().length < 2) {
+      errors.location = 'Укажите местоположение';
+    }
+    return errors;
+  }
+
+  const [validationErrors, setValidationErrors] = useState({});
+  const [autoSaveTimer, setAutoSaveTimer] = useState(null);
+
+  // Автосохранение при изменении
+  useEffect(() => {
+    if (!user) return;
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    const errors = validateProfile(formData);
+    setValidationErrors(errors);
+    if (Object.keys(errors).length === 0) {
+      const timer = setTimeout(() => {
+        const userDocRef = doc(db, 'users', user.uid);
+        setDoc(userDocRef, {
+          ...formData,
+          email: user.email,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      }, 1000);
+      setAutoSaveTimer(timer);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,9 +136,10 @@ const ProfileSetup = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Введите ФИО полностью"
-                className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.fullName ? 'border-red-500' : 'border-[#374151]'} text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
                 required
               />
+              {validationErrors.fullName && <div className="text-red-400 text-xs mt-1">{validationErrors.fullName}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -92,9 +151,10 @@ const ProfileSetup = () => {
                 onAccept={handlePhone}
                 unmask={false}
                 placeholder="+7 (___) ___-__-__"
-                className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.phone ? 'border-red-500' : 'border-[#374151]'} text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
                 required
               />
+              {validationErrors.phone && <div className="text-red-400 text-xs mt-1">{validationErrors.phone}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -104,8 +164,9 @@ const ProfileSetup = () => {
                 type="email"
                 value={user?.email || ''}
                 readOnly
-                className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-gray-400 cursor-not-allowed"
+                className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.email ? 'border-red-500' : 'border-[#374151]'} text-gray-400 cursor-not-allowed`}
               />
+              {validationErrors.email && <div className="text-red-400 text-xs mt-1">{validationErrors.email}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -129,6 +190,7 @@ const ProfileSetup = () => {
                 onChange={val => setFormData(prev => ({ ...prev, location: val }))}
                 placeholder="Город, страна"
               />
+              {validationErrors.location && <div className="text-red-400 text-xs mt-1">{validationErrors.location}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">

@@ -6,6 +6,7 @@ import { subscribeToUserData } from './services/databaseService';
 import Toast from './components/Toast';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './components/LocationAutocomplete';
+import { getCityByCoords } from './utils/geoUtils';
 
 const Profile = () => {
   const { user, logout, updateUserProfile } = useAuth();
@@ -24,25 +25,38 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [profileError, setProfileError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
+  const [autoSaveTimer, setAutoSaveTimer] = useState(null);
 
   useEffect(() => {
     let unsubscribe;
-    
+
     if (user) {
       unsubscribe = subscribeToUserData(user.uid, (data) => {
-        if (data) {
-          setUserInfo({
-            fullName: data.fullName || '',
-            phone: data.phone || '',
-            displayName: data.displayName || '',
-            bio: data.bio || '',
-            location: data.location || '',
-            skills: data.skills || '',
-            github: data.github || '',
-            website: data.website || '',
-            email: user.email || ''
-          });
+        let location = data.location || '';
+        // Если поле location пустое, пробуем взять из localStorage (геолокация)
+        if (!location && typeof window !== 'undefined') {
+          const loc = localStorage.getItem('userLocation');
+          if (loc && loc !== 'denied' && loc !== 'unsupported') {
+            try {
+              const { lat, lon } = JSON.parse(loc);
+              getCityByCoords(lat, lon).then(city => {
+                if (city) setUserInfo(prev => ({ ...prev, location: city }));
+              });
+            } catch {}
+          }
         }
+        setUserInfo({
+          fullName: data.fullName || '',
+          phone: data.phone || '',
+          displayName: data.displayName || '',
+          bio: data.bio || '',
+          location: location,
+          skills: data.skills || '',
+          github: data.github || '',
+          website: data.website || '',
+          email: user.email || ''
+        });
       });
     }
 
@@ -89,6 +103,43 @@ const Profile = () => {
     }
   };
 
+  // Валидация профиля
+  function validateProfile(data) {
+    const errors = {};
+    if (!data.fullName || data.fullName.trim().length < 3) {
+      errors.fullName = 'Введите корректное ФИО (минимум 3 символа)';
+    }
+    if (!/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(data.phone)) {
+      errors.phone = 'Введите телефон в формате +7 (XXX) XXX-XX-XX';
+    }
+    if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) {
+      errors.email = 'Некорректный email';
+    }
+    if (!data.location || data.location.trim().length < 2) {
+      errors.location = 'Укажите местоположение';
+    }
+    return errors;
+  }
+
+  // Автосохранение профиля при изменении
+  useEffect(() => {
+    if (!user) return;
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    const errors = validateProfile(userInfo);
+    setValidationErrors(errors);
+    if (Object.keys(errors).length === 0) {
+      // Сохраняем с задержкой (debounce)
+      const timer = setTimeout(() => {
+        updateUserProfile(userInfo).catch((err) => {
+          setProfileError('Ошибка автосохранения: ' + (err.message || String(err)));
+        });
+      }, 1000);
+      setAutoSaveTimer(timer);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line
+  }, [userInfo]);
+
   if (!user) {
     return <Auth />;
   }
@@ -97,11 +148,13 @@ const Profile = () => {
     <div className="min-h-screen bg-[#121212] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto bg-[#23272f] rounded-2xl shadow-2xl overflow-hidden border border-[#2d3748]">
         {toast.show && (
-          <Toast 
-            message={toast.message} 
-            type={toast.type} 
-            onClose={hideToast}
-          />
+          <div className="pointer-events-none">
+            <Toast 
+              message={toast.message} 
+              type={toast.type} 
+              onClose={hideToast}
+            />
+          </div>
         )}
         <div className="px-8 py-8 sm:p-10">
           <div className="flex justify-end mb-6">
@@ -129,9 +182,10 @@ const Profile = () => {
                 value={userInfo.fullName}
                 onChange={e => setUserInfo({ ...userInfo, fullName: e.target.value })}
                 placeholder="Введите ФИО полностью"
-                className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.fullName ? 'border-red-500' : 'border-[#374151]'} text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
                 required
               />
+              {validationErrors.fullName && <div className="text-red-400 text-xs mt-1">{validationErrors.fullName}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Телефон</label>
@@ -141,9 +195,10 @@ const Profile = () => {
                 onAccept={value => setUserInfo({ ...userInfo, phone: value })}
                 unmask={false}
                 placeholder="+7 (___) ___-__-__"
-                className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.phone ? 'border-red-500' : 'border-[#374151]'} text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
                 required
               />
+              {validationErrors.phone && <div className="text-red-400 text-xs mt-1">{validationErrors.phone}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
@@ -151,8 +206,9 @@ const Profile = () => {
                 type="email"
                 value={userInfo.email}
                 readOnly
-                className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-gray-400 cursor-not-allowed"
+                className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.email ? 'border-red-500' : 'border-[#374151]'} text-gray-400 cursor-not-allowed`}
               />
+              {validationErrors.email && <div className="text-red-400 text-xs mt-1">{validationErrors.email}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">О себе</label>
@@ -171,6 +227,7 @@ const Profile = () => {
                 onChange={val => setUserInfo({ ...userInfo, location: val })}
                 placeholder="Город, страна"
               />
+              {validationErrors.location && <div className="text-red-400 text-xs mt-1">{validationErrors.location}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Навыки</label>
