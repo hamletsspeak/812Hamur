@@ -1,7 +1,9 @@
 import React from 'react';
 import { m } from './config/animations';
+import { useLanguage } from "./contexts/LanguageContext";
 
 const Footer = () => {
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
   
   return (
@@ -14,7 +16,7 @@ const Footer = () => {
         className="container mx-auto px-6 text-center"
       >
         <p className="text-gray-400 hover:text-blue-400 transition-colors duration-300">
-          &copy; {currentYear} hamletsspeak. Все права защищены.
+          &copy; {currentYear} hamletsspeak. {t("allRightsReserved")}
         </p>
       </m.div>
     </footer>

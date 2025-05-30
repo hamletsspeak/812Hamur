@@ -2,6 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { m, AnimatePresence } from './config/animations';
 import { fadeInFromRightVariant, zoomRotateVariant, useScrollAnimation } from './config/animations';
 import { getRepositories } from './services/githubService';
+import { useLanguage } from "./contexts/LanguageContext";
 
 const ProjectCard = memo(({ project, onViewGithub, direction }) => {
   const scrollAnimation = useScrollAnimation(0.3);
@@ -80,6 +81,7 @@ const NavigationButton = ({ onClick, direction, children }) => (
 );
 
 const Projects = () => {
+  const { t } = useLanguage();
   const titleScrollAnimation = useScrollAnimation();
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState('right');
@@ -175,7 +177,7 @@ const Projects = () => {
     return (
       <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center p-8">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-bold mb-12 shimmer-text">Мои проекты</h2>
+          <h2 className="text-5xl font-bold mb-12 shimmer-text">{t("projectsTitle")}</h2>
           <div className="space-y-6 w-full max-w-md mx-auto">
             <div className="h-8 bg-gray-700 rounded-lg animate-pulse"></div>
             <div className="h-32 bg-gray-700 rounded-lg animate-pulse"></div>
@@ -184,7 +186,7 @@ const Projects = () => {
               <div className="h-12 w-24 bg-gray-700 rounded-lg animate-pulse"></div>
             </div>
             <p className="text-center text-gray-400 mt-6">
-              {retryCount > 0 ? `Повторная попытка ${retryCount}/2...` : 'Загрузка проектов...'}
+              {retryCount > 0 ? t("retryAttempt", {count: retryCount}) : t("loadingProjects")}
             </p>
           </div>
         </div>
@@ -196,14 +198,14 @@ const Projects = () => {
     return (
       <section id="projects" className="snap-start min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center p-8">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-bold mb-12 shimmer-text">Мои проекты</h2>
+          <h2 className="text-5xl font-bold mb-12 shimmer-text">{t("projectsTitle")}</h2>
           <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
             <div className="text-red-400 mb-6">{error}</div>
             <button
               onClick={handleRetry}
               className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 font-medium"
             >
-              Попробовать снова
+              {t("tryAgain")}
             </button>
           </div>
         </div>
@@ -219,7 +221,7 @@ const Projects = () => {
           variants={zoomRotateVariant}
           {...titleScrollAnimation}
         >
-          Мои проекты
+          {t("projectsTitle")}
         </m.h2>
         
         <div className="flex flex-col items-center">

@@ -7,10 +7,12 @@ import Toast from './components/Toast';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './components/LocationAutocomplete';
 import { getCityByCoords } from './utils/geoUtils';
+import { useLanguage } from './contexts/LanguageContext';
 
 const Profile = () => {
   const { user, logout, updateUserProfile } = useAuth();
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
   const [userInfo, setUserInfo] = useState({
     fullName: '',
     phone: '',
@@ -68,7 +70,7 @@ const Profile = () => {
   }, [user]);
 
   const showToast = (message, type = 'success') => {
-    setToast({ show: true, message, type });
+    setToast({ show: true, message: typeof message === 'string' ? t(message) : message, type });
     setTimeout(() => {
       setToast({ show: false, message: '', type: 'success' });
     }, 1000);
@@ -80,7 +82,7 @@ const Profile = () => {
       await logout();
       navigate('/');
     } catch (err) {
-      showToast('Ошибка при выходе из системы. Попробуйте еще раз', 'error');
+      showToast('logoutError', 'error');
       console.error('Ошибка при выходе:', err);
     } finally {
       setIsLoading(false);
@@ -92,11 +94,11 @@ const Profile = () => {
     setProfileError('');
     try {
       await updateUserProfile(userInfo);
-      showToast('Профиль успешно обновлен');
+      showToast('profileUpdated');
     } catch (err) {
       console.error('Ошибка при обновлении профиля:', err);
       setProfileError(err.message || String(err));
-      showToast('Ошибка при обновлении профиля', 'error');
+      showToast('profileUpdateError', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -119,25 +121,6 @@ const Profile = () => {
     }
     return errors;
   }
-
-  // Автосохранение профиля при изменении
-  useEffect(() => {
-    if (!user) return;
-    if (autoSaveTimer) clearTimeout(autoSaveTimer);
-    const errors = validateProfile(userInfo);
-    setValidationErrors(errors);
-    if (Object.keys(errors).length === 0) {
-      // Сохраняем с задержкой (debounce)
-      const timer = setTimeout(() => {
-        updateUserProfile(userInfo).catch((err) => {
-          setProfileError('Ошибка автосохранения: ' + (err.message || String(err)));
-        });
-      }, 1000);
-      setAutoSaveTimer(timer);
-      return () => clearTimeout(timer);
-    }
-    // eslint-disable-next-line
-  }, [userInfo]);
 
   if (!user) {
     return <Auth />;
@@ -162,11 +145,11 @@ const Profile = () => {
               disabled={isLoading}
               className="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow-md transition disabled:opacity-60"
             >
-              {isLoading ? 'Выход...' : 'Выйти'}
+              {isLoading ? t('loggingOut') : t('logout')}
             </button>
           </div>
           <h3 className="text-2xl font-bold text-white mb-8 text-center tracking-wide">
-            Личные данные
+            {t('personalData')}
           </h3>
           {profileError && (
             <div className="bg-red-500/20 border border-red-500 text-red-100 px-4 py-2 rounded mb-4">
@@ -175,29 +158,29 @@ const Profile = () => {
           )}
           <form className="space-y-6" onSubmit={e => { e.preventDefault(); handleSaveProfile(); }}>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">ФИО</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{t('fullName')}</label>
               <input
                 type="text"
                 value={userInfo.fullName}
                 onChange={e => setUserInfo({ ...userInfo, fullName: e.target.value })}
-                placeholder="Введите ФИО полностью"
+                placeholder={t('fullNamePlaceholder')}
                 className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.fullName ? 'border-red-500' : 'border-[#374151]'} text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
                 required
               />
-              {validationErrors.fullName && <div className="text-red-400 text-xs mt-1">{validationErrors.fullName}</div>}
+              {validationErrors.fullName && <div className="text-red-400 text-xs mt-1">{t(validationErrors.fullName)}</div>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Телефон</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{t('phone')}</label>
               <IMaskInput
                 mask="+7 (000) 000-00-00"
                 value={userInfo.phone}
                 onAccept={value => setUserInfo({ ...userInfo, phone: value })}
                 unmask={false}
-                placeholder="+7 (___) ___-__-__"
+                placeholder={t('phonePlaceholder')}
                 className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.phone ? 'border-red-500' : 'border-[#374151]'} text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition`}
                 required
               />
-              {validationErrors.phone && <div className="text-red-400 text-xs mt-1">{validationErrors.phone}</div>}
+              {validationErrors.phone && <div className="text-red-400 text-xs mt-1">{t(validationErrors.phone)}</div>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
@@ -207,34 +190,34 @@ const Profile = () => {
                 readOnly
                 className={`w-full px-4 py-3 rounded-lg bg-[#181c23] border ${validationErrors.email ? 'border-red-500' : 'border-[#374151]'} text-gray-400 cursor-not-allowed`}
               />
-              {validationErrors.email && <div className="text-red-400 text-xs mt-1">{validationErrors.email}</div>}
+              {validationErrors.email && <div className="text-red-400 text-xs mt-1">{t(validationErrors.email)}</div>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">О себе</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{t('about')}</label>
               <textarea
                 value={userInfo.bio}
                 onChange={e => setUserInfo({ ...userInfo, bio: e.target.value })}
                 rows="3"
-                placeholder="Расскажите о себе..."
+                placeholder={t('aboutPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Местоположение</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{t('location')}</label>
               <LocationAutocomplete
                 value={userInfo.location}
                 onChange={val => setUserInfo({ ...userInfo, location: val })}
-                placeholder="Город, страна"
+                placeholder={t('locationPlaceholder')}
               />
-              {validationErrors.location && <div className="text-red-400 text-xs mt-1">{validationErrors.location}</div>}
+              {validationErrors.location && <div className="text-red-400 text-xs mt-1">{t(validationErrors.location)}</div>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Навыки</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">{t('skills')}</label>
               <input
                 type="text"
                 value={userInfo.skills}
                 onChange={e => setUserInfo({ ...userInfo, skills: e.target.value })}
-                placeholder="Например: React, Node.js, Python"
+                placeholder={t('skillsPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-[#181c23] border border-[#374151] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
@@ -250,7 +233,7 @@ const Profile = () => {
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Личный сайт</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{t('website')}</label>
                 <input
                   type="url"
                   value={userInfo.website}
@@ -266,7 +249,7 @@ const Profile = () => {
                 disabled={isLoading}
                 className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg shadow-md transition disabled:opacity-60"
               >
-                {isLoading ? 'Сохранение...' : 'Сохранить изменения'}
+                {isLoading ? t('saving') : t('saveChanges')}
               </button>
             </div>
           </form>

@@ -4,6 +4,7 @@ import OptimizedImage from './components/OptimizedImage';
 import gmailIconPath from './icons/gmail-icon.png';
 import telegramIconPath from './icons/telegram-icon.png';
 import {zoomRotateVariant, useScrollAnimation } from './config/animations';
+import { useLanguage } from "./contexts/LanguageContext";
 
 const ContactLink = memo(({ href, icon, alt, text }) => (
   <m.a
@@ -59,6 +60,7 @@ const ContactLink = memo(({ href, icon, alt, text }) => (
 ));
 
 const Contact = memo(() => {
+  const { t } = useLanguage();
   return (
     <section
       id="contact"
@@ -70,20 +72,16 @@ const Contact = memo(() => {
           variants={zoomRotateVariant}
           {...useScrollAnimation()}
         >
-          Контакты
+          {t("contactsTitle")}
         </m.h2>
         <m.p 
           className="text-xl text-gray-400 mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{
-            type: "spring",
-            stiffness: 400,
-            damping: 30
-          }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
         >
-          Свяжитесь со мной удобным для вас способом
+          {t("contactsText")}
         </m.p>
         <div className="flex flex-col gap-6 items-center">
           <ContactLink

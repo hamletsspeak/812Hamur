@@ -1,26 +1,29 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "./contexts/AuthContext";
+import Auth from './components/Auth';
+import { useLanguage } from "./contexts/LanguageContext";
 
 const Header = () => {
   const { user } = useAuth();
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
-  
+  const [showAuth, setShowAuth] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
+
   const greetings = useMemo(() => [
-    "HELLO WORLD!", // English
-    "ПРИВЕТ МИР!", // Russian
-    "¡HOLA MUNDO!", // Spanish
-    "BONJOUR LE MONDE!", // French
-    "HALLO WELT!", // German
-    "CIAO MONDO!", // Italian
-    "OLÁ MUNDO!", // Portuguese
-    "HALO DUNIA!", // Indonesian
-    "HALLO WERELD!", // Dutch
-    "MERHABA DÜNYA!", // Turkish
-    "ΓΕΙΑ ΣΟΥ ΚΟΣΜΕ!", // Greek
-    "世界你好！" // Chinese
-  ], []);
+    t("helloWorld"),
+    "BONJOUR LE MONDE!",
+    "¡HOLA MUNDO!",
+    "HALLO WELT!",
+    "CIAO MONDO!",
+    "OLÁ MUNDO!",
+    "HALO DUNIA!",
+    "HALLO WERELD!",
+    "MERHABA DÜNYA!",
+    "ΓΕΙΑ ΣΟΥ ΚΟΣΜΕ!",
+    "世界你好！"
+  ], [t]);
 
   const period = 2000;
   const delta = 200;
@@ -57,12 +60,19 @@ const Header = () => {
           <span className="text-blue-500 animate-pulse">|</span>
         </h1>
       </div>
-      
       {!user && (
-        <p className="text-lg mt-8 text-gray-400">
-          Войдите, чтобы увидеть больше информации
-        </p>
+        <button
+          className="text-lg mt-8 text-blue-400 hover:underline focus:outline-none bg-transparent border-none cursor-pointer"
+          onClick={() => setShowAuth(true)}
+          type="button"
+        >
+          {t("loginToSeeMore")}
+        </button>
       )}
+      <div className="mt-4">
+        {/* Переключатель языка удалён, теперь он только в Navbar */}
+      </div>
+      <Auth isOpen={showAuth} onClose={() => setShowAuth(false)} />
     </header>
   );
 };

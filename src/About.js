@@ -1,8 +1,14 @@
 import React from "react";
 import { m } from "framer-motion";
 import { fadeInFromLeftVariant, zoomRotateVariant, useScrollAnimation } from "./config/animations";
+import { useLanguage } from "./contexts/LanguageContext";
+import { useTypewriter } from "./components/useTypewriter";
 
 const About = () => {
+  const { t, language } = useLanguage();
+  const aboutText = t(language === 'ru' ? 'aboutText' : 'aboutTextEn');
+  const typedText = useTypewriter(aboutText);
+
   return (
     <section
       id="about"
@@ -21,24 +27,19 @@ const About = () => {
           variants={zoomRotateVariant}
           {...useScrollAnimation()}
         >
-          Обо мне
+          {t("aboutTitle")}
         </m.h2>
         
         <m.div 
           className="space-y-6"
           variants={fadeInFromLeftVariant}
-          {...useScrollAnimation(0.2)}
         >
           <m.p 
-            className="text-xl leading-relaxed"
-            whileHover={{ scale: 1.02 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20
-            }}
+            className="text-xl leading-relaxed typewriter-effect"
           >
-            Изучаю Frontend разработку и верстаю сайты.
+            {typedText.map((item, idx) => (
+              <span key={idx} className={item.visible ? "typed" : "not-typed"}>{item.char}</span>
+            ))}
           </m.p>
           
           <m.div
@@ -54,29 +55,6 @@ const About = () => {
             }}
             {...useScrollAnimation(0.3)}
           >
-            <m.div 
-              className="p-4 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 hover:border-blue-500/50 transition-all duration-300"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ y: -5 }}
-            >
-              <h3 className="text-xl font-semibold mb-2 text-blue-400">Frontend</h3>
-              <p className="text-gray-300">React, JavaScript, TypeScript, HTML5, CSS3</p>
-            </m.div>
-            
-            <m.div 
-              className="p-4 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 hover:border-blue-500/50 transition-all duration-300"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ y: -5 }}
-            >
-              <h3 className="text-xl font-semibold mb-2 text-blue-400">UI/UX</h3>
-              <p className="text-gray-300">Анимации, Адаптивный дизайн, Интерактивность</p>
-            </m.div>
           </m.div>
         </m.div>
       </div>

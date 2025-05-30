@@ -7,6 +7,7 @@ import { AnimationProvider } from "./config/animations";
 import CachedRoute from "./components/CachedRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CookieConsent from "./components/CookieConsent";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import "./index.css";
 
 // Lazy load components
@@ -43,67 +44,69 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <AnimationProvider>
-        <Router>
-          <div className="min-h-screen bg-[#121212]">
-            <CursorLight />
-            <Navbar />
-            <Routes>
-              <Route
-                path="/profile"
-                element={
-                  <CachedRoute>
-                    <ProtectedRoute>
+    <LanguageProvider>
+      <AuthProvider>
+        <AnimationProvider>
+          <Router>
+            <div className="min-h-screen bg-[#121212]">
+              <CursorLight />
+              <Navbar />
+              <Routes>
+                <Route
+                  path="/profile"
+                  element={
+                    <CachedRoute>
+                      <ProtectedRoute>
+                        <div className="pt-16">
+                          <Profile />
+                        </div>
+                      </ProtectedRoute>
+                    </CachedRoute>
+                  }
+                />
+                <Route
+                  path="/game"
+                  element={
+                    <CachedRoute>
                       <div className="pt-16">
-                        <Profile />
+                        <Match3Game />
                       </div>
-                    </ProtectedRoute>
-                  </CachedRoute>
-                }
-              />
-              <Route
-                path="/game"
-                element={
-                  <CachedRoute>
-                    <div className="pt-16">
-                      <Match3Game />
-                    </div>
-                  </CachedRoute>
-                }
-              />
-              <Route
-                path="/profile-setup"
-                element={
-                  <CachedRoute>
-                    <ProtectedRoute>
-                      <div className="pt-16">
-                        <ProfileSetup />
-                      </div>
-                    </ProtectedRoute>
-                  </CachedRoute>
-                }
-              />
-              <Route
-                path="/"
-                element={
-                  <CachedRoute>
-                    <main className="h-screen snap-y snap-mandatory overflow-y-auto scroll-pt-16">
-                      <Header />
-                      <About />
-                      <Projects />
-                      <Contact />
-                      <Footer />
-                    </main>
-                  </CachedRoute>
-                }
-              />
-            </Routes>
-            <CookieConsent />
-          </div>
-        </Router>
-      </AnimationProvider>
-    </AuthProvider>
+                    </CachedRoute>
+                  }
+                />
+                <Route
+                  path="/profile-setup"
+                  element={
+                    <CachedRoute>
+                      <ProtectedRoute>
+                        <div className="pt-16">
+                          <ProfileSetup />
+                        </div>
+                      </ProtectedRoute>
+                    </CachedRoute>
+                  }
+                />
+                <Route
+                  path="/"
+                  element={
+                    <CachedRoute>
+                      <main>
+                        <Header />
+                        <About />
+                        <Projects />
+                        <Contact />
+                        <Footer />
+                      </main>
+                    </CachedRoute>
+                  }
+                />
+              </Routes>
+              <CookieConsent />
+            </div>
+          </Router>
+        </AnimationProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

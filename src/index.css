@@ -8,7 +8,7 @@ html {
 
 @font-face {
   font-family: "ForestSmooth";
-  src: url("./fonts/Daneehand_Regular_Cyr.ttf") format("truetype");
+  src: url("./fonts/HomeVideo-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -20,12 +20,21 @@ html {
   font-style: normal;
 }
 
+@font-face {
+  font-family: "HomeVideo-Regular";
+  src: url("./fonts/HomeVideo-Regular.ttf") format("truetype"),
+       url("./fonts/HomeVideo-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+1D2B, U+1D78; /* Кириллица */
+}
+
 body {
-  font-family: 'Montserrat', 'Daneehand_Regular_Cyr', sans-serif;
+  font-family: 'Montserrat', 'HomeVideo-Regular', sans-serif;
 }
 
 .navbar-font {
-  font-family: 'Minecraft', cursive, sans-serif !important;
+  font-family: 'Minecraft', 'HomeVideo-Regular', 'Montserrat', cursive, sans-serif !important;
 }
 
 @keyframes shimmer-glow {
@@ -135,4 +144,13 @@ body {
   .will-change-transform {
     will-change: auto !important;
   }
+}
+
+.typewriter-effect .typed {
+  opacity: 1;
+  transition: opacity 0.1s linear;
+}
+.typewriter-effect .not-typed {
+  opacity: 0.2;
+  transition: opacity 0.1s linear;
 }

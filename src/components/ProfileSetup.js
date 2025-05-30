@@ -6,10 +6,12 @@ import { db } from '../firebase';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './LocationAutocomplete';
 import { getCityByCoords } from '../utils/geoUtils';
+import { useLanguage } from "../contexts/LanguageContext";
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -58,27 +60,6 @@ const ProfileSetup = () => {
   const [validationErrors, setValidationErrors] = useState({});
   const [autoSaveTimer, setAutoSaveTimer] = useState(null);
 
-  // Автосохранение при изменении
-  useEffect(() => {
-    if (!user) return;
-    if (autoSaveTimer) clearTimeout(autoSaveTimer);
-    const errors = validateProfile(formData);
-    setValidationErrors(errors);
-    if (Object.keys(errors).length === 0) {
-      const timer = setTimeout(() => {
-        const userDocRef = doc(db, 'users', user.uid);
-        setDoc(userDocRef, {
-          ...formData,
-          email: user.email,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-      }, 1000);
-      setAutoSaveTimer(timer);
-      return () => clearTimeout(timer);
-    }
-    // eslint-disable-next-line
-  }, [formData]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -117,7 +98,7 @@ const ProfileSetup = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#121212] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl w-full space-y-8 bg-[#23272f] p-8 rounded-2xl shadow-2xl border border-[#2d3748]">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-          Настройка профиля
+          {t("profileSetupTitle")}
         </h2>
         {error && (
           <div className="bg-red-500/20 border border-red-500 text-red-100 px-4 py-2 rounded mb-4" role="alert">
@@ -128,7 +109,7 @@ const ProfileSetup = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                ФИО
+                {t("fullName")}
               </label>
               <input
                 type="text"
@@ -143,7 +124,7 @@ const ProfileSetup = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                Телефон
+                {t("phone")}
               </label>
               <IMaskInput
                 mask="+7 (000) 000-00-00"
@@ -170,7 +151,7 @@ const ProfileSetup = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                О себе
+                {t("about")}
               </label>
               <textarea
                 name="bio"
@@ -183,7 +164,7 @@ const ProfileSetup = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                Местоположение
+                {t("location")}
               </label>
               <LocationAutocomplete
                 value={formData.location}
@@ -194,7 +175,7 @@ const ProfileSetup = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                Навыки
+                {t("skills")}
               </label>
               <input
                 type="text"
@@ -221,7 +202,7 @@ const ProfileSetup = () => {
               </div>
               <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Личный сайт
+                  {t("website")}
                 </label>
                 <input
                   type="url"
@@ -240,14 +221,14 @@ const ProfileSetup = () => {
               disabled={loading}
               className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg shadow-md transition disabled:opacity-60"
             >
-              {loading ? 'Сохранение...' : 'Сохранить профиль'}
+              {loading ? t("saving") : t("saveChanges")}
             </button>
             <button
               type="button"
               onClick={() => navigate('/profile')}
               className="w-full py-3 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold text-lg border border-gray-500 transition"
             >
-              Пропустить
+              {t("skip")}
             </button>
           </div>
         </form>
