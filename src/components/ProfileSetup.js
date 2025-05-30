@@ -23,7 +23,7 @@ const ProfileSetup = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors] = useState({});
 
   useEffect(() => {
     if (!formData.location && typeof window !== 'undefined') {

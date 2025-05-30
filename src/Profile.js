@@ -27,7 +27,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [profileError, setProfileError] = useState('');
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors] = useState({});
 
   useEffect(() => {
     let unsubscribe;
