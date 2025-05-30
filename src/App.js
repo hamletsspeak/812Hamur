@@ -17,8 +17,8 @@ const Projects = lazy(() => import("./Projects"));
 const Contact = lazy(() => import("./Contact"));
 const Footer = lazy(() => import("./Footer"));
 const Profile = lazy(() => import("./Profile"));
-const Match3Game = lazy(() => import("./components/Match3Game"));
 const ProfileSetup = lazy(() => import("./components/ProfileSetup"));
+const WebGLGame = React.lazy(() => import("./components/WebGLGame"));
 
 function App() {
   useEffect(() => {
@@ -65,12 +65,10 @@ function App() {
                   }
                 />
                 <Route
-                  path="/game"
+                  path="/webgl-game"
                   element={
                     <CachedRoute>
-                      <div className="pt-16">
-                        <Match3Game />
-                      </div>
+                      <WebGLGame />
                     </CachedRoute>
                   }
                 />

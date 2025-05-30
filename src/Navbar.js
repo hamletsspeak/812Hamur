@@ -164,7 +164,7 @@ const Navbar = () => {
               }}
               className={`fixed sm:relative top-0 left-0 h-screen sm:h-auto w-full sm:w-auto bg-[#1f1f1f]/95 sm:bg-transparent flex flex-col sm:flex-row items-center justify-center gap-8 text-white will-change-transform backdrop-blur-sm sm:backdrop-blur-none`}
             >
-              {location.pathname === '/' && mainLinks.map((link) => (
+              {location.pathname === '/' && mainLinks.filter(link => !link.to).map((link) => (
                 <NavLink
                   key={link.id}
                   to={`#${link.id}`}
@@ -202,6 +202,12 @@ const Navbar = () => {
                   </svg>
                   <span className="font-bold">{language.toUpperCase()}</span>
                 </m.button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-300 shadow-md ml-2"
+                  onClick={() => window.open('game/index.html', '_blank')}
+                >
+                  Открыть игру
+                </button>
               </div>
             </m.ul>
           )}
