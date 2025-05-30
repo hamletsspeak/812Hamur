@@ -9,7 +9,7 @@ const Header = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   const greetings = useMemo(() => [
     t("helloWorld"),

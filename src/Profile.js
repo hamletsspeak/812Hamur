@@ -12,7 +12,7 @@ import { useLanguage } from './contexts/LanguageContext';
 const Profile = () => {
   const { user, logout, updateUserProfile } = useAuth();
   const navigate = useNavigate();
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [userInfo, setUserInfo] = useState({
     fullName: '',
     phone: '',
@@ -28,7 +28,6 @@ const Profile = () => {
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [profileError, setProfileError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
-  const [autoSaveTimer, setAutoSaveTimer] = useState(null);
 
   useEffect(() => {
     let unsubscribe;
@@ -103,24 +102,6 @@ const Profile = () => {
       setIsLoading(false);
     }
   };
-
-  // Валидация профиля
-  function validateProfile(data) {
-    const errors = {};
-    if (!data.fullName || data.fullName.trim().length < 3) {
-      errors.fullName = 'Введите корректное ФИО (минимум 3 символа)';
-    }
-    if (!/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(data.phone)) {
-      errors.phone = 'Введите телефон в формате +7 (XXX) XXX-XX-XX';
-    }
-    if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) {
-      errors.email = 'Некорректный email';
-    }
-    if (!data.location || data.location.trim().length < 2) {
-      errors.location = 'Укажите местоположение';
-    }
-    return errors;
-  }
 
   if (!user) {
     return <Auth />;

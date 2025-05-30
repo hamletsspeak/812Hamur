@@ -23,6 +23,7 @@ const ProfileSetup = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     if (!formData.location && typeof window !== 'undefined') {
@@ -38,27 +39,6 @@ const ProfileSetup = () => {
     }
     // eslint-disable-next-line
   }, []);
-
-  // Валидация профиля
-  function validateProfile(data) {
-    const errors = {};
-    if (!data.fullName || data.fullName.trim().length < 3) {
-      errors.fullName = 'Введите корректное ФИО (минимум 3 символа)';
-    }
-    if (!/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(data.phone)) {
-      errors.phone = 'Введите телефон в формате +7 (XXX) XXX-XX-XX';
-    }
-    if (!user?.email || !/^\S+@\S+\.\S+$/.test(user.email)) {
-      errors.email = 'Некорректный email';
-    }
-    if (!data.location || data.location.trim().length < 2) {
-      errors.location = 'Укажите местоположение';
-    }
-    return errors;
-  }
-
-  const [validationErrors, setValidationErrors] = useState({});
-  const [autoSaveTimer, setAutoSaveTimer] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
