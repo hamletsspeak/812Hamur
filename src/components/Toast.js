@@ -21,6 +21,7 @@ const Toast = ({ message, type = 'success', onClose, duration = 1000 }) => {
       onClose();
     }, duration);
 
+    
     return () => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
