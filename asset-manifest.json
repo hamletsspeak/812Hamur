@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/812Hamur/static/css/main.1eb06642.css",
-    "main.js": "/812Hamur/static/js/main.2dced03f.js",
+    "main.css": "/812Hamur/static/css/main.ee91770f.css",
+    "main.js": "/812Hamur/static/js/main.b1732b19.js",
     "static/js/339.9a756682.chunk.js": "/812Hamur/static/js/339.9a756682.chunk.js",
     "static/js/396.4d946c60.chunk.js": "/812Hamur/static/js/396.4d946c60.chunk.js",
     "static/js/879.7ff1b0a1.chunk.js": "/812Hamur/static/js/879.7ff1b0a1.chunk.js",
@@ -9,7 +9,7 @@
     "static/js/913.75941061.chunk.js": "/812Hamur/static/js/913.75941061.chunk.js",
     "static/js/41.91cc5f6e.chunk.js": "/812Hamur/static/js/41.91cc5f6e.chunk.js",
     "static/js/67.11fa6239.chunk.js": "/812Hamur/static/js/67.11fa6239.chunk.js",
-    "static/js/42.2d3cfd84.chunk.js": "/812Hamur/static/js/42.2d3cfd84.chunk.js",
+    "static/js/42.9d625772.chunk.js": "/812Hamur/static/js/42.9d625772.chunk.js",
     "static/js/453.97621859.chunk.js": "/812Hamur/static/js/453.97621859.chunk.js",
     "static/js/95.48f539a5.chunk.js": "/812Hamur/static/js/95.48f539a5.chunk.js",
     "static/js/213.513dee1f.chunk.js": "/812Hamur/static/js/213.513dee1f.chunk.js",
@@ -19,8 +19,8 @@
     "static/media/gmail-icon.png": "/812Hamur/static/media/gmail-icon.f8dfbe8b0875e9328ff2.png",
     "static/media/telegram-icon.png": "/812Hamur/static/media/telegram-icon.5d8b65f5e935acaad1ec.png",
     "index.html": "/812Hamur/index.html",
-    "main.1eb06642.css.map": "/812Hamur/static/css/main.1eb06642.css.map",
-    "main.2dced03f.js.map": "/812Hamur/static/js/main.2dced03f.js.map",
+    "main.ee91770f.css.map": "/812Hamur/static/css/main.ee91770f.css.map",
+    "main.b1732b19.js.map": "/812Hamur/static/js/main.b1732b19.js.map",
     "339.9a756682.chunk.js.map": "/812Hamur/static/js/339.9a756682.chunk.js.map",
     "396.4d946c60.chunk.js.map": "/812Hamur/static/js/396.4d946c60.chunk.js.map",
     "879.7ff1b0a1.chunk.js.map": "/812Hamur/static/js/879.7ff1b0a1.chunk.js.map",
@@ -28,13 +28,13 @@
     "913.75941061.chunk.js.map": "/812Hamur/static/js/913.75941061.chunk.js.map",
     "41.91cc5f6e.chunk.js.map": "/812Hamur/static/js/41.91cc5f6e.chunk.js.map",
     "67.11fa6239.chunk.js.map": "/812Hamur/static/js/67.11fa6239.chunk.js.map",
-    "42.2d3cfd84.chunk.js.map": "/812Hamur/static/js/42.2d3cfd84.chunk.js.map",
+    "42.9d625772.chunk.js.map": "/812Hamur/static/js/42.9d625772.chunk.js.map",
     "453.97621859.chunk.js.map": "/812Hamur/static/js/453.97621859.chunk.js.map",
     "95.48f539a5.chunk.js.map": "/812Hamur/static/js/95.48f539a5.chunk.js.map",
     "213.513dee1f.chunk.js.map": "/812Hamur/static/js/213.513dee1f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1eb06642.css",
-    "static/js/main.2dced03f.js"
+    "static/css/main.ee91770f.css",
+    "static/js/main.b1732b19.js"
   ]
 }
