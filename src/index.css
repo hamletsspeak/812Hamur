@@ -29,8 +29,28 @@ html {
   unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+1D2B, U+1D78; /* Кириллица */
 }
 
-body {
-  font-family: 'Montserrat', 'HomeVideo-Regular', sans-serif;
+@font-face {
+  font-family: "MinecraftRU";
+  src: url("./fonts/minecraft.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+1D2B, U+1D78; /* Только кириллица */
+}
+
+@font-face {
+  font-family: "MinecraftEN";
+  src: url("./fonts/minecraft_0.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  unicode-range: U+0020-007F, U+00A0-00FF; /* Basic Latin + Latin-1 Supplement */
+}
+
+body, html {
+  font-family: 'MinecraftEN', 'MinecraftRU', 'Montserrat', 'HomeVideo-Regular', sans-serif;
+}
+
+.ru-font, [lang="ru"] {
+  font-family: 'MinecraftRU', 'Montserrat', 'HomeVideo-Regular', sans-serif !important;
 }
 
 .navbar-font {
@@ -144,6 +164,11 @@ body {
   .will-change-transform {
     will-change: auto !important;
   }
+  .mobile-navbar-transparent {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
 }
 
 .typewriter-effect .typed {
@@ -153,4 +178,8 @@ body {
 .typewriter-effect .not-typed {
   opacity: 0.2;
   transition: opacity 0.1s linear;
+}
+
+.minecraft-en-font {
+  font-family: 'MinecraftEN', 'MinecraftRU', 'Montserrat', 'HomeVideo-Regular', sans-serif !important;
 }

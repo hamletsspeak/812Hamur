@@ -108,16 +108,40 @@ const Navbar = () => {
           stiffness: 300,
           damping: 30
         }}
-        className="fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg navbar-font h-20 sm:h-20 md:h-20"
+        className={`fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg navbar-font h-20 sm:h-20 md:h-20 ${typeof window !== 'undefined' && window.innerWidth <= 640 ? 'mobile-navbar-transparent' : ''}`}
       >
-        <m.button 
-          onClick={handleLogoClick} 
-          className="text-white text-2xl font-semibold hover:text-blue-400 transition-colors duration-300"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <button
+          onClick={handleLogoClick}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            margin: 0,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            height: 60,
+          }}
+          aria-label="На главную"
         >
-          Hamlet
-        </m.button>
+          <img
+            src="https://s14.gifyu.com/images/bxkP7.gif"
+            alt="Logo2"
+            style={{
+              width: 140,
+              height: 60,
+              objectFit: 'contain',
+              display: 'block',
+              background: 'none',
+              border: 'none',
+              margin: 0,
+              padding: 0,
+              pointerEvents: 'auto',
+              userSelect: 'auto',
+            }}
+            draggable={false}
+          />
+        </button>
         <div className="hidden sm:flex flex-1 justify-end items-center">
           <ul className="flex gap-8 items-center">
             {mainLinks.map((link) => (

@@ -35,7 +35,7 @@ const About = () => {
           variants={fadeInFromLeftVariant}
         >
           <m.p 
-            className="text-xl leading-relaxed typewriter-effect"
+            className="text-xl leading-relaxed typewriter-effect minecraft-en-font"
           >
             {typedText.map((item, idx) => (
               <span key={idx} className={item.visible ? "typed" : "not-typed"}>{item.char}</span>

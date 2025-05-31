@@ -59,6 +59,7 @@ const Header = () => {
           {displayText}
           <span className="text-blue-500 animate-pulse">|</span>
         </h1>
+        {/* Анимированное лого убрано */}
       </div>
       {!user && (
         <button
