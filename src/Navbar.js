@@ -108,7 +108,7 @@ const Navbar = () => {
           stiffness: 300,
           damping: 30
         }}
-        className="fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg navbar-font"
+        className="fixed top-0 left-0 w-full bg-[#1f1f1f]/95 backdrop-blur-sm flex justify-between items-center px-6 py-4 z-50 shadow-lg navbar-font h-20 sm:h-20 md:h-20"
       >
         <m.button 
           onClick={handleLogoClick} 
@@ -118,7 +118,54 @@ const Navbar = () => {
         >
           Hamlet
         </m.button>
-
+        <div className="hidden sm:flex flex-1 justify-end items-center">
+          <ul className="flex gap-8 items-center">
+            {mainLinks.map((link) => (
+              <NavLink
+                key={link.id}
+                to={`#${link.id}`}
+                onClick={(e) => handleScroll(e, link.id)}
+              >
+                {link.text}
+              </NavLink>
+            ))}
+            {user && (
+              <NavLink to="/profile" onClick={() => { setMenuOpen(false); navigate('/profile'); }}>
+                {t('profile')}
+              </NavLink>
+            )}
+            {!user && (
+              <li>
+                <button
+                  onClick={handleAuthClick}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-300 shadow-md"
+                >
+                  {t('loginOrRegister')}
+                </button>
+              </li>
+            )}
+            <li>
+              <button
+                className="bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition-all duration-300 tracking-wide text-base flex items-center gap-2 border-2 border-blue-400 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:scale-95"
+                onClick={() => window.open('game/index.html', '_blank')}
+              >
+                {t('openGame')}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'ru' : 'en')}
+                className="flex items-center gap-2 px-3 py-2 rounded bg-gray-700 text-gray-300 hover:bg-blue-500 hover:text-white transition-colors font-semibold text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+                aria-label="Switch language"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 0c2.21 0 4 4.03 4 9s-1.79 9-4 9-4-4.03-4-9 1.79-9 4-9zm0 0v18" />
+                </svg>
+                <span className="font-bold">{language.toUpperCase()}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
         <div className="sm:hidden relative z-50">
           <m.button
             onClick={toggleMenu}
@@ -150,9 +197,9 @@ const Navbar = () => {
             />
           </m.button>
         </div>
-
+        {/* Мобильное меню */}
         <AnimatePresence>
-          {(menuOpen || window.innerWidth > 640) && (
+          {menuOpen && (
             <m.ul
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
@@ -162,9 +209,9 @@ const Navbar = () => {
                 stiffness: 300,
                 damping: 30
               }}
-              className={`fixed sm:relative top-0 left-0 h-screen sm:h-auto w-full sm:w-auto bg-[#1f1f1f]/95 sm:bg-transparent flex flex-col sm:flex-row items-center justify-center gap-8 text-white will-change-transform backdrop-blur-sm sm:backdrop-blur-none`}
+              className="fixed top-0 left-0 h-screen w-full bg-[#1f1f1f]/95 flex flex-col items-center justify-center gap-8 text-white will-change-transform backdrop-blur-sm z-40"
             >
-              {location.pathname === '/' && mainLinks.filter(link => !link.to).map((link) => (
+              {mainLinks.map((link) => (
                 <NavLink
                   key={link.id}
                   to={`#${link.id}`}
@@ -173,42 +220,39 @@ const Navbar = () => {
                   {link.text}
                 </NavLink>
               ))}
-              <div className="flex items-center gap-2">
-                <m.li
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              {user && (
+                <NavLink to="/profile" onClick={() => { setMenuOpen(false); navigate('/profile'); }}>
+                  {t('profile')}
+                </NavLink>
+              )}
+              <li>
+                <button
+                  onClick={handleAuthClick}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-300 shadow-md w-full"
                 >
-                  <button
-                    onClick={handleAuthClick}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-300 shadow-md"
-                  >
-                    {user ? t('profile') : t('loginOrRegister')}
-                  </button>
-                </m.li>
-                <m.button
+                  {t('loginOrRegister')}
+                </button>
+              </li>
+              <li>
+                <button
+                  className="bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition-all duration-300 tracking-wide text-base flex items-center gap-2 border-2 border-blue-400 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:scale-95 w-full"
+                  onClick={() => window.open('game/index.html', '_blank')}
+                >
+                  {t('openGame')}
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => setLanguage(language === 'en' ? 'ru' : 'en')}
-                  className="flex items-center gap-2 px-3 py-2 rounded bg-gray-700 text-gray-300 hover:bg-blue-500 hover:text-white transition-colors font-semibold text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="flex items-center gap-2 px-3 py-2 rounded bg-gray-700 text-gray-300 hover:bg-blue-500 hover:text-white transition-colors font-semibold text-base focus:outline-none focus:ring-2 focus:ring-blue-400 w-full justify-center"
                   aria-label="Switch language"
-                  whileTap={{ scale: 0.9, rotate: 15 }}
-                  whileHover={{ scale: 1.08 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                  style={{ minWidth: 48 }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 0c2.21 0 4 4.03 4 9s-1.79 9-4 9-4-4.03-4-9 1.79-9 4-9zm0 0v18" />
                   </svg>
                   <span className="font-bold">{language.toUpperCase()}</span>
-                </m.button>
-                <button
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-300 shadow-md ml-2"
-                  onClick={() => window.open('game/index.html', '_blank')}
-                >
-                  Открыть игру
                 </button>
-              </div>
+              </li>
             </m.ul>
           )}
         </AnimatePresence>

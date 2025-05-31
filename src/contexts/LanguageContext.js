@@ -62,6 +62,7 @@ const translations = {
     authError: 'An authentication error occurred',
     profile: 'Profile',
     loginOrRegister: 'Log in / Register',
+    openGame: 'Open Game',
   },
   ru: {
     loginToSeeMore: 'Войдите, чтобы увидеть больше информации',
@@ -123,13 +124,15 @@ const translations = {
     authError: 'Произошла ошибка при авторизации',
     profile: 'Профиль',
     loginOrRegister: 'Войти / Регистрация',
+    openGame: 'Войти в игру',
   },
 };
 
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('en');
+  // Язык по умолчанию теперь русский
+  const [language, setLanguage] = useState('ru');
 
   const value = useMemo(() => ({
     language,

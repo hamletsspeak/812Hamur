@@ -88,7 +88,7 @@ function App() {
                   path="/"
                   element={
                     <CachedRoute>
-                      <main>
+                      <main className="h-screen overflow-y-auto sm:overflow-y-visible sm:h-auto sm:snap-none snap-y snap-mandatory">
                         <Header />
                         <About />
                         <Projects />
