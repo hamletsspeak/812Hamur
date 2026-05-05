@@ -57,7 +57,10 @@ export function AuthProvider({ children }) {
 
   async function loginWithGithub() {
     try {
-      const redirectTo = `${window.location.origin}/#/profile`;
+      const isLocalhost = window.location.hostname === 'localhost';
+      const redirectTo = isLocalhost
+        ? 'http://localhost:3000/#/profile'
+        : 'https://www.hamleturu.ru/#/profile';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: { redirectTo }
