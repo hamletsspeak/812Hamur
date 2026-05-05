@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { supabase } from '../supabase';
 
 const DatabaseViewer = ({ path }) => {
     const [data, setData] = useState(null);
@@ -8,39 +7,61 @@ const DatabaseViewer = ({ path }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Разбиваем путь на коллекцию и документ
-        const [collection, documentId, ...rest] = path.split('/');
-        
-        if (!collection || !documentId) {
-            setError('Неверный путь к документу');
+        // Формат path: users/<userId>/<optionalField>
+        const [table, rowId, ...rest] = path.split('/');
+
+        if (table !== 'users' || !rowId) {
+            setError('Поддерживается только путь users/<id>');
             setLoading(false);
             return;
         }
 
-        const docRef = doc(db, collection, documentId);
-        
-        const unsubscribe = onSnapshot(docRef, (snapshot) => {
-            if (snapshot.exists()) {
-                let data = snapshot.data();
-                // Если есть дополнительный путь, получаем вложенные данные
+        let mounted = true;
+
+        const fetchData = async () => {
+            const { data: row, error: fetchError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', rowId)
+                .maybeSingle();
+
+            if (!mounted) return;
+            if (fetchError) {
+                setError(fetchError.message);
+                setLoading(false);
+                return;
+            }
+
+            if (row) {
+                let resolved = row;
                 if (rest.length > 0) {
                     for (const key of rest) {
-                        data = data?.[key];
-                        if (!data) break;
+                        resolved = resolved?.[key];
+                        if (!resolved) break;
                     }
                 }
-                setData(data);
+                setData(resolved);
             } else {
                 setData(null);
             }
             setLoading(false);
-        }, (error) => {
-            console.error('Ошибка при получении данных:', error);
-            setError(error.message);
-            setLoading(false);
-        });
+        };
 
-        return () => unsubscribe();
+        fetchData();
+
+        const channel = supabase
+            .channel(`db-viewer-${rowId}`)
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'users', filter: `id=eq.${rowId}` },
+                () => fetchData()
+            )
+            .subscribe();
+
+        return () => {
+            mounted = false;
+            supabase.removeChannel(channel);
+        };
     }, [path]);
 
     if (loading) return <div>Загрузка данных...</div>;

@@ -1,24 +1,22 @@
-import { db } from '../firebase';
-import { doc, getDoc, setDoc, runTransaction } from 'firebase/firestore';
+import { supabase } from '../supabase';
 
 // Получить следующий доступный индекс пользователя
 export const getNextUserIndex = async () => {
-  const counterRef = doc(db, 'counters', 'userIndex');
-  
   try {
-    const result = await runTransaction(db, async (transaction) => {
-      const counterDoc = await transaction.get(counterRef);
-      
-      let nextIndex = 1;
-      if (counterDoc.exists()) {
-        nextIndex = counterDoc.data().value + 1;
-      }
-      
-      transaction.set(counterRef, { value: nextIndex });
-      return nextIndex;
-    });
-    
-    return result;
+    const { data: counter, error: readError } = await supabase
+      .from('counters')
+      .select('value')
+      .eq('id', 'userIndex')
+      .maybeSingle();
+    if (readError) throw readError;
+
+    const nextIndex = (counter?.value || 0) + 1;
+    const { error: upsertError } = await supabase
+      .from('counters')
+      .upsert({ id: 'userIndex', value: nextIndex }, { onConflict: 'id' });
+    if (upsertError) throw upsertError;
+
+    return nextIndex;
   } catch (error) {
     console.error('Ошибка при получении следующего индекса:', error);
     throw new Error('Не удалось получить индекс пользователя');
@@ -27,18 +25,24 @@ export const getNextUserIndex = async () => {
 
 // Получить или создать индекс для пользователя
 export const getUserIndex = async (userId) => {
-  const userIndexRef = doc(db, 'userIndices', userId);
-  
   try {
-    const userIndexDoc = await getDoc(userIndexRef);
-    
-    if (userIndexDoc.exists()) {
-      return userIndexDoc.data().index;
+    const { data: existing, error: readError } = await supabase
+      .from('user_indices')
+      .select('user_index')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (readError) throw readError;
+
+    if (existing?.user_index) {
+      return existing.user_index;
     }
-    
-    // Если индекс не существует, создаем новый
+
     const newIndex = await getNextUserIndex();
-    await setDoc(userIndexRef, { index: newIndex });
+    const { error: upsertError } = await supabase
+      .from('user_indices')
+      .upsert({ user_id: userId, user_index: newIndex }, { onConflict: 'user_id' });
+    if (upsertError) throw upsertError;
+
     return newIndex;
   } catch (error) {
     console.error('Ошибка при получении индекса пользователя:', error);

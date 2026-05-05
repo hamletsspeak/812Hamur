@@ -1,28 +1,17 @@
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  onSnapshot 
-} from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 
 export const saveUserData = async (userId, data) => {
   try {
-    const docRef = doc(db, 'users', userId);
-    
-    // Получаем текущие данные
-    const currentDoc = await getDoc(docRef);
-    const currentData = currentDoc.exists() ? currentDoc.data() : {};
-    
-    // Объединяем текущие данные с новыми
-    const updatedData = {
-      ...currentData,
-      ...data,
-      updatedAt: new Date().toISOString()
-    };
+    const { data: currentData, error: readError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+    if (readError) throw readError;
 
-    await setDoc(docRef, updatedData);
+    const updatedData = { ...currentData, ...data, id: userId, updatedAt: new Date().toISOString() };
+    const { error } = await supabase.from('users').upsert(updatedData, { onConflict: 'id' });
+    if (error) throw error;
     return updatedData;
   } catch (error) {
     console.error('Ошибка при сохранении данных пользователя:', error);
@@ -32,9 +21,13 @@ export const saveUserData = async (userId, data) => {
 
 export const getUserData = async (userId) => {
   try {
-    const docRef = doc(db, 'users', userId);
-    const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? docSnap.data() : null;
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+    if (error) throw error;
+    return data || null;
   } catch (error) {
     console.error('Ошибка при получении данных пользователя:', error);
     throw new Error('Не удалось получить данные пользователя');
@@ -45,18 +38,15 @@ export const updateUserData = async (userId, data) => {
   try {
     if (!userId) throw new Error('User ID is required');
     
-    const docRef = doc(db, 'users', userId);
     const timestamp = new Date().toISOString();
-    
-    const updateData = {
-      ...data,
-      updatedAt: timestamp,
-      lastModified: timestamp
-    };
 
-    await updateDoc(docRef, updateData);
-    
-    // Возвращаем обновленные данные
+    const updateData = { ...data, updatedAt: timestamp, lastModified: timestamp };
+    const { error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', userId);
+    if (error) throw error;
+
     return updateData;
   } catch (error) {
     console.error('Error updating user data:', error);
@@ -65,45 +55,43 @@ export const updateUserData = async (userId, data) => {
 };
 
 export const subscribeToUserData = (userId, callback) => {
-  const docRef = doc(db, 'users', userId);
-  
-  // Подписываемся на изменения документа
-  const unsubscribe = onSnapshot(docRef, (doc) => {
-    if (doc.exists()) {
-      callback(doc.data());
-    } else {
-      callback(null);
-    }
-  }, (error) => {
-    console.error('Ошибка при получении данных:', error);
-  });
+  let isActive = true;
 
-  // Возвращаем функцию отписки
-  return unsubscribe;
+  const fetchCurrent = async () => {
+    try {
+      const userData = await getUserData(userId);
+      if (isActive) callback(userData);
+    } catch (error) {
+      console.error('Ошибка при получении данных:', error);
+    }
+  };
+
+  fetchCurrent();
+
+  const channel = supabase
+    .channel(`user-profile-${userId}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'users', filter: `id=eq.${userId}` },
+      (payload) => callback(payload.new || null)
+    )
+    .subscribe();
+
+  return () => {
+    isActive = false;
+    supabase.removeChannel(channel);
+  };
 };
 
 export const subscribeToUserField = (userId, field, callback) => {
-  const docRef = doc(db, 'users', userId);
-  
-  const unsubscribe = onSnapshot(docRef, (doc) => {
-    if (doc.exists()) {
-      const data = doc.data();
-      callback(data[field]);
-    } else {
-      callback(null);
-    }
-  }, (error) => {
-    console.error(`Ошибка при получении поля ${field}:`, error);
+  return subscribeToUserData(userId, (data) => {
+    callback(data ? data[field] : null);
   });
-
-  return unsubscribe;
 };
 
 export const updateUserAvatar = async (userId, avatarData) => {
   try {
-    const docRef = doc(db, 'users', userId);
-    
-    await updateDoc(docRef, {
+    const { error } = await supabase.from('users').update({
       photoURL: avatarData.url,
       avatar: {
         url: avatarData.url,
@@ -112,7 +100,8 @@ export const updateUserAvatar = async (userId, avatarData) => {
         height: avatarData.height,
         updatedAt: new Date().toISOString()
       }
-    });
+    }).eq('id', userId);
+    if (error) throw error;
 
     return avatarData;
   } catch (error) {

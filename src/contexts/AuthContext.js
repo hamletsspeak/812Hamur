@@ -1,13 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  signInWithPopup,
-  updateProfile as updateFirebaseProfile
-} from 'firebase/auth';
-import { auth, githubProvider } from '../firebase';
+import { supabase } from '../supabase';
 import { saveUserData, getUserData, updateUserData } from '../services/databaseService';
 
 const AuthContext = createContext();
@@ -22,10 +14,14 @@ export function AuthProvider({ children }) {
 
   async function signup(email, password) {
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+      const signedUpUser = data.user;
+      if (!signedUpUser) throw new Error('Не удалось создать пользователя');
+
       // Сохраняем начальные данные пользователя
-      await saveUserData(result.user.uid, {
-        email: result.user.email,
+      await saveUserData(signedUpUser.id, {
+        email: signedUpUser.email,
         displayName: '',
         photoURL: '',
         bio: '',
@@ -36,7 +32,7 @@ export function AuthProvider({ children }) {
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString()
       });
-      return result;
+      return { user: signedUpUser };
     } catch (error) {
       throw error;
     }
@@ -44,12 +40,16 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      const loggedInUser = data.user;
+      if (!loggedInUser) throw new Error('Не удалось авторизоваться');
+
       // Обновляем время последнего входа
-      await updateUserData(result.user.uid, {
+      await updateUserData(loggedInUser.id, {
         lastLogin: new Date().toISOString()
       });
-      return result;
+      return { user: loggedInUser };
     } catch (error) {
       throw error;
     }
@@ -57,24 +57,13 @@ export function AuthProvider({ children }) {
 
   async function loginWithGithub() {
     try {
-      const result = await signInWithPopup(auth, githubProvider);
-      const isNewUser = result.additionalUserInfo.isNewUser;
-      
-      // Сохраняем/обновляем данные пользователя GitHub
-      await saveUserData(result.user.uid, {
-        email: result.user.email,
-        displayName: result.user.displayName || '',
-        photoURL: result.user.photoURL || '',
-        githubProfile: true,
-        bio: '',
-        location: '',
-        skills: '',
-        github: result.additionalUserInfo?.profile?.html_url || '',
-        website: result.additionalUserInfo?.profile?.blog || '',
-        createdAt: isNewUser ? new Date().toISOString() : undefined,
-        lastLogin: new Date().toISOString()
+      const redirectTo = `${window.location.origin}/#/profile`;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo }
       });
-      return result;
+      if (error) throw error;
+      return { oauth: true };
     } catch (error) {
       throw error;
     }
@@ -93,34 +82,35 @@ export function AuthProvider({ children }) {
         console.error('Ошибка при обновлении времени выхода:', error);
       }
       
-      await signOut(auth);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     } catch (error) {
       throw error;
     }
   }
 
   async function updateUserProfile(profileData) {
-    if (!auth.currentUser) throw new Error('Пользователь не авторизован');
+    if (!user) throw new Error('Пользователь не авторизован');
 
     try {
-      // Обновляем базовые поля в Firebase Auth
-      const authUpdate = {
-        displayName: profileData.displayName
-      };
-      if (profileData.photoURL) {
-        authUpdate.photoURL = profileData.photoURL;
-      }
-      await updateFirebaseProfile(auth.currentUser, authUpdate);
+      // Обновляем базовые поля в Supabase Auth metadata
+      const { error: authUpdateError } = await supabase.auth.updateUser({
+        data: {
+          displayName: profileData.displayName,
+          photoURL: profileData.photoURL || null
+        }
+      });
+      if (authUpdateError) throw authUpdateError;
 
-      // Обновляем расширенные данные в Firestore
-      await updateUserData(auth.currentUser.uid, {
+      // Обновляем расширенные данные в таблице users
+      await updateUserData(user.uid, {
         ...profileData,
         updatedAt: new Date().toISOString()
       });
 
-      // Обновляем локальное состояние пользователя
-      const updatedUser = auth.currentUser;
-      const userData = await getUserData(auth.currentUser.uid);
+      const { data: authData } = await supabase.auth.getUser();
+      const updatedUser = authData?.user;
+      const userData = await getUserData(user.uid);
       setUser({
         ...updatedUser,
         ...userData
@@ -131,14 +121,34 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentUser = data?.session?.user || null;
+      if (currentUser) {
         try {
-          const userData = await getUserData(user.uid);
-          setUser({ ...user, ...userData });
+          const userData = await getUserData(currentUser.id);
+          setUser({ ...currentUser, uid: currentUser.id, ...userData });
         } catch (error) {
           console.error('Ошибка при получении данных пользователя:', error);
-          setUser(user);
+          setUser({ ...currentUser, uid: currentUser.id });
+        }
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    };
+
+    init();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_, session) => {
+      const currentUser = session?.user || null;
+      if (currentUser) {
+        try {
+          const userData = await getUserData(currentUser.id);
+          setUser({ ...currentUser, uid: currentUser.id, ...userData });
+        } catch (error) {
+          console.error('Ошибка при получении данных пользователя:', error);
+          setUser({ ...currentUser, uid: currentUser.id });
         }
       } else {
         setUser(null);
@@ -146,7 +156,9 @@ export function AuthProvider({ children }) {
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   const value = {

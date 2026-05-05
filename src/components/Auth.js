@@ -15,7 +15,7 @@ const Auth = ({ isOpen, onClose }) => {
   const [error, setError] = useState('');
   const { login, signup, loginWithGithub } = useAuth();
 
-  const getErrorMessage = (errorCode) => {
+  const getErrorMessage = (errorCode, errorMessage = '') => {
     switch (errorCode) {
       case 'auth/user-not-found':
         return t('userNotFound');
@@ -38,6 +38,9 @@ const Auth = ({ isOpen, onClose }) => {
       case 'auth/unauthorized-domain':
         return t('unauthorizedDomain');
       default:
+        if (errorMessage.includes('Invalid login credentials')) return t('wrongPassword');
+        if (errorMessage.includes('User already registered')) return t('emailInUse');
+        if (errorMessage.includes('Password should be at least')) return t('weakPassword');
         return t('authError');
     }
   };
@@ -67,18 +70,16 @@ const Auth = ({ isOpen, onClose }) => {
         handleSuccess(true);
       }
     } catch (err) {
-      setError(getErrorMessage(err.code));
+      setError(getErrorMessage(err.code, err.message || ''));
     }
   };
 
   const handleGithubLogin = async () => {
     setError('');
     try {
-      const result = await loginWithGithub();
-      const isNewUser = result?.additionalUserInfo?.isNewUser;
-      handleSuccess(isNewUser);
+      await loginWithGithub();
     } catch (err) {
-      setError(getErrorMessage(err.code) || err.message || 'Ошибка GitHub авторизации');
+      setError(getErrorMessage(err.code, err.message || '') || err.message || 'Ошибка GitHub авторизации');
     }
   };
 

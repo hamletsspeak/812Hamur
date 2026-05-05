@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './LocationAutocomplete';
 import { getCityByCoords } from '../utils/geoUtils';
 import { useLanguage } from "../contexts/LanguageContext";
+import { saveUserData } from '../services/databaseService';
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
@@ -58,12 +57,11 @@ const ProfileSetup = () => {
     setError('');
 
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      await setDoc(userDocRef, {
+      await saveUserData(user.uid, {
         ...formData,
         email: user.email,
         updatedAt: new Date().toISOString()
-      }, { merge: true });
+      });
 
       navigate('/profile');
     } catch (err) {
