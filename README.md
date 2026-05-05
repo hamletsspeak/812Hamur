@@ -19,15 +19,17 @@ npm start
    - `http://localhost:3000/#/profile`
    - `https://<your-railway-domain>/#/profile`
 
-## Railway deploy
+## Vercel deploy via GitHub
 
-Проект готов к деплою через `Dockerfile` + `railway.toml`.
-
-1. Создайте сервис в Railway из этого репозитория.
-2. Добавьте переменные окружения:
+1. Запушьте проект в GitHub-репозиторий.
+2. В Vercel нажмите `Add New -> Project` и импортируйте этот репозиторий.
+3. В `Environment Variables` добавьте:
    - `REACT_APP_SUPABASE_URL`
    - `REACT_APP_SUPABASE_ANON_KEY`
-   - `REACT_APP_GITHUB_TOKEN` (опционально)
-3. Запустите Deploy.
+   - `REACT_APP_GITHUB_TOKEN` (опционально, если хотите увеличить лимиты GitHub API)
+4. Нажмите `Deploy`.
 
-Порт подхватывается автоматически через переменную `PORT`.
+Проект собирается командой `npm run build`, а артефакты берутся из папки `build` (настроено в `vercel.json`).
+
+После первого деплоя добавьте Vercel-домен в Supabase Auth `Redirect URLs`:
+- `https://<your-vercel-domain>/#/profile`
