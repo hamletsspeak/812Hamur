@@ -45,7 +45,7 @@ const decodeBase64 = (value) => {
 };
 
 const cleanGeneratedDescription = (value) =>
-  value
+  (value || '')
     .replace(/[‐‑‒–—]/g, '-')
     .replace(/\*\*/g, '')
     .replace(/^[-*]\s*/, '')
@@ -53,6 +53,59 @@ const cleanGeneratedDescription = (value) =>
     .replace(/^["'«]+|["'»]+$/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+
+const splitTokens = (value) =>
+  (value || '')
+    .toLowerCase()
+    .replace(/[^a-zа-я0-9+#.\s-]/gi, ' ')
+    .split(/[\s/_-]+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 3);
+
+const uniq = (items) => [...new Set(items)];
+
+const pickTopKeywords = (repo, readme) => {
+  const stopWords = new Set([
+    'the', 'and', 'for', 'with', 'from', 'that', 'this', 'your', 'you', 'are', 'was', 'were',
+    'или', 'как', 'что', 'для', 'это', 'про', 'без', 'под', 'над', 'при', 'есть', 'будет',
+    'учебный', 'проект', 'pet', 'github', 'repo', 'repository', 'readme'
+  ]);
+
+  const tokenMap = new Map();
+  const sourceTokens = [
+    ...splitTokens(repo.name),
+    ...splitTokens(repo.language),
+    ...(repo.topics || []).flatMap(splitTokens),
+    ...splitTokens(repo.description),
+    ...splitTokens(readme).slice(0, 500)
+  ];
+
+  sourceTokens.forEach((token) => {
+    if (stopWords.has(token)) return;
+    tokenMap.set(token, (tokenMap.get(token) || 0) + 1);
+  });
+
+  return [...tokenMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([token]) => token);
+};
+
+const buildLocalDescription = (repo, readme) => {
+  const topics = uniq((repo.topics || []).map((topic) => topic.trim()).filter(Boolean)).slice(0, 3);
+  const keywords = pickTopKeywords(repo, readme).slice(0, 3);
+  const language = repo.language ? ` на ${repo.language}` : '';
+
+  if (topics.length > 0) {
+    return `Проект${language} по теме ${topics.join(', ')}. Репозиторий развивается и отражает практические задачи автора.`;
+  }
+
+  if (keywords.length > 0) {
+    return `Проект${language}, сфокусированный на ${keywords.join(', ')}. Создан для практики и применения рабочих подходов.`;
+  }
+
+  return `Проект${language} с открытым исходным кодом на GitHub, созданный для практики и развития инженерных навыков.`;
+};
 
 const getRepositoryReadme = async (repoName, headers) => {
   try {
@@ -89,10 +142,7 @@ ${readme || 'README отсутствует или недоступен'}
   return cleanGeneratedDescription(description);
 };
 
-const getFallbackDescription = (repo) => {
-  const language = repo.language ? ` на ${repo.language}` : '';
-  return `Учебный или pet-проект${language}, опубликованный на GitHub для практики и развития навыков.`;
-};
+const getFallbackDescription = (repo, readme = '') => buildLocalDescription(repo, readme);
 
 const enrichRepository = async (repo, headers) => {
   if (repo.description) {
@@ -102,17 +152,21 @@ const enrichRepository = async (repo, headers) => {
   try {
     const readme = await getRepositoryReadme(repo.name, headers);
     const generatedDescription = await generateDescriptionFromGithub(repo, readme);
+    const fallbackDescription = getFallbackDescription(repo, readme);
+    const finalDescription = generatedDescription || fallbackDescription;
+    const descriptionSource = generatedDescription ? 'ai' : 'fallback';
 
     return {
       ...repo,
-      description: generatedDescription || getFallbackDescription(repo),
-      descriptionSource: 'ai'
+      description: finalDescription,
+      descriptionSource
     };
   } catch (error) {
     console.warn(`Не удалось сгенерировать описание для ${repo.name}:`, error);
+    const readme = await getRepositoryReadme(repo.name, headers);
     return {
       ...repo,
-      description: getFallbackDescription(repo),
+      description: getFallbackDescription(repo, readme),
       descriptionSource: 'fallback'
     };
   }

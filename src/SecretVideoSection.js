@@ -26,6 +26,7 @@ const SecretVideoSection = () => {
   const [oneEvadeCount, setOneEvadeCount] = useState(0);
   const [oneConvertedToFive, setOneConvertedToFive] = useState(false);
   const [oneButtonStyle, setOneButtonStyle] = useState({ transform: "translate(0px, 0px)", opacity: 1 });
+  const [isOneHovered, setIsOneHovered] = useState(false);
 
   const reactionByRating = {
     1: "это было больно, но честно.",
@@ -173,17 +174,24 @@ const SecretVideoSection = () => {
   return (
     <section id="hidden-video" className="snap-start min-h-screen px-5 py-24">
       <div className="max-w-6xl mx-auto min-h-[70vh] flex items-center justify-center">
-        <div className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white/70 px-6 py-8 sm:px-10 sm:py-10 text-center shadow-sm">
-          <h2 className="text-3xl sm:text-4xl whitespace-nowrap text-slate-900 font-bold tracking-tight">Оцените сайт, пожалуйста</h2>
-          <p className="mt-3 text-slate-600 text-sm sm:text-base">
+        <div className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white/70 px-4 py-7 sm:px-10 sm:py-10 text-center shadow-sm">
+          <h2 className="text-2xl leading-tight sm:text-4xl text-slate-900 font-bold tracking-tight">Оцените сайт, пожалуйста</h2>
+          <p className="mt-3 text-slate-600 text-xs sm:text-base">
             Анонимно, без сохранения персональных данных.
           </p>
 
-          <div className="mt-7 flex items-center justify-center gap-2 sm:gap-3 relative h-14">
+          <div className="mt-7 relative group">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 relative h-14">
             <button
               type="button"
               onClick={() => handleRate(1)}
-              onMouseEnter={handleOneHover}
+              onMouseEnter={() => {
+                setIsOneHovered(true);
+                handleOneHover();
+              }}
+              onMouseLeave={() => setIsOneHovered(false)}
+              onFocus={() => setIsOneHovered(true)}
+              onBlur={() => setIsOneHovered(false)}
               disabled={isSaving}
               style={oneButtonStyle}
               className={`relative z-10 h-12 w-12 rounded-xl border text-lg font-bold transition-all duration-150 ${
@@ -211,6 +219,10 @@ const SecretVideoSection = () => {
                 {value}
               </button>
             ))}
+            </div>
+            <p className={`pointer-events-none mt-2 text-xs text-slate-500 transition-opacity duration-300 ${isOneHovered ? "opacity-60" : "opacity-0"}`}>
+              На оценку 1 можно нажимать несколько раз
+            </p>
           </div>
 
           <div className="mt-4 min-h-[48px]">

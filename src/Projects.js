@@ -5,25 +5,34 @@ import { getRepositories } from './services/githubService';
 import { useLanguage } from "./contexts/LanguageContext";
 
 const ProjectCard = memo(({ project, onViewGithub }) => {
+  const isSasagramProject = /сасаграм|sasagram/i.test(project?.name || '');
+
   return (
     <m.div
       variants={fadeInFromRightVariant}
       {...useScrollAnimation(0.2)}
-      className="glass-card rounded-3xl p-6 sm:p-8 w-full"
+      className="glass-card rounded-3xl p-5 sm:p-8 w-full"
     >
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="text-2xl font-bold text-slate-900">{project.name}</h3>
+      <div className="flex items-start justify-between gap-3 sm:gap-4">
+        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 break-words">{project.name}</h3>
         {project.stars > 0 && (
           <span className="accent-pill">{project.stars} stars</span>
         )}
       </div>
-      <p className="mt-4 text-slate-600 leading-7">{project.description || 'Описание отсутствует'}</p>
+      <p className="mt-3 sm:mt-4 text-slate-600 leading-6 sm:leading-7 text-sm sm:text-base">{project.description || 'Описание отсутствует'}</p>
       {project.language && (
         <p className="mt-3 text-sm text-sky-700 font-semibold">{project.language}</p>
       )}
-      <button onClick={() => onViewGithub(project.link)} className="btn-primary mt-6 font-semibold">
-        Смотреть на GitHub
-      </button>
+      <div className="mt-6 flex gap-3 flex-wrap">
+        <button onClick={() => onViewGithub(project.link)} className="btn-primary font-semibold">
+          Смотреть на GitHub
+        </button>
+        {isSasagramProject && (
+          <button onClick={() => window.open('https://sasavot141.ru', '_blank', 'noopener,noreferrer')} className="btn-outline font-semibold">
+            Посмотреть сайт
+          </button>
+        )}
+      </div>
     </m.div>
   );
 });
@@ -69,10 +78,10 @@ const Projects = () => {
         <div className="flex items-center justify-between flex-wrap gap-4 mb-10">
           <div>
             <span className="accent-pill">Portfolio</span>
-            <h2 className="section-title mt-4 text-slate-900 font-bold">{t("projectsTitle")}</h2>
+            <h2 className="section-title mt-4 text-slate-900 font-bold text-3xl sm:text-5xl leading-tight">{t("projectsTitle")}</h2>
           </div>
           {projects.length > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-slate-600">
+            <div className="rounded-2xl border border-slate-200 bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-slate-600">
               {current + 1} / {projects.length}
             </div>
           )}
@@ -91,9 +100,9 @@ const Projects = () => {
             <AnimatePresence mode="wait">
               <ProjectCard key={projects[current].id || current} project={projects[current]} onViewGithub={handleViewGithub} />
             </AnimatePresence>
-            <div className="mt-6 flex gap-3">
-              <button className="btn-outline" onClick={() => setCurrent((p) => (p - 1 + projects.length) % projects.length)}>Назад</button>
-              <button className="btn-primary" onClick={() => setCurrent((p) => (p + 1) % projects.length)}>Вперёд</button>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <button className="btn-outline w-full sm:w-auto" onClick={() => setCurrent((p) => (p - 1 + projects.length) % projects.length)}>Назад</button>
+              <button className="btn-primary w-full sm:w-auto" onClick={() => setCurrent((p) => (p + 1) % projects.length)}>Вперёд</button>
             </div>
           </>
         )}
