@@ -1,14 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useAuth } from "./contexts/AuthContext";
-import Auth from './components/Auth';
 import { useLanguage } from "./contexts/LanguageContext";
 
 const Header = () => {
   const { user } = useAuth();
-  const [displayText, setDisplayText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [loopNum, setLoopNum] = useState(0);
-  const [showAuth, setShowAuth] = useState(false);
   const { t } = useLanguage();
 
   const greetings = useMemo(() => [
@@ -16,64 +11,46 @@ const Header = () => {
     "BONJOUR LE MONDE!",
     "¡HOLA MUNDO!",
     "HALLO WELT!",
-    "CIAO MONDO!",
-    "OLÁ MUNDO!",
-    "HALO DUNIA!",
-    "HALLO WERELD!",
-    "MERHABA DÜNYA!",
-    "ΓΕΙΑ ΣΟΥ ΚΟΣΜΕ!",
-    "世界你好！"
+    "CIAO MONDO!"
   ], [t]);
 
-  const period = 2000;
-  const delta = 200;
-
-  useEffect(() => {
-    let ticker = null;
-    
-    const tick = () => {
-      let i = loopNum % greetings.length;
-      let fullText = greetings[i];
-      let updatedText = isDeleting 
-        ? fullText.substring(0, displayText.length - 1)
-        : fullText.substring(0, displayText.length + 1);
-
-      setDisplayText(updatedText);
-
-      if (!isDeleting && updatedText === fullText) {
-        setTimeout(() => setIsDeleting(true), period);
-      } else if (isDeleting && updatedText === '') {
-        setIsDeleting(false);
-        setLoopNum(prev => prev + 1);
-      }
-    };
-
-    ticker = setInterval(tick, delta);
-    return () => clearInterval(ticker);
-  }, [displayText, isDeleting, loopNum, greetings, period, delta]);
+  const displayText = greetings[0];
 
   return (
-    <header id="header" className="snap-start min-h-screen bg-[#121212] flex flex-col items-center justify-center text-white text-center px-4">
-      <div>
-        <h1 className="text-5xl sm:text-7xl font-bold">
-          {displayText}
-          <span className="text-blue-500 animate-pulse">|</span>
-        </h1>
-        {/* Анимированное лого убрано */}
+    <header id="header" className="snap-start min-h-screen pt-28 pb-16 px-5">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <span className="accent-pill">Frontend Developer</span>
+          <h1 className="section-title font-bold mt-5 hero-gradient-text">
+            {displayText}
+            <span className="text-orange-500">|</span>
+          </h1>
+          <p className="text-slate-600 mt-6 text-lg leading-relaxed max-w-xl">
+            Создаю быстрые, выразительные и удобные интерфейсы. Этот сайт теперь полностью в новом визуальном стиле: светлый, структурный и живой.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a href={user ? "#projects" : "#projects"} className="btn-primary font-semibold">{t("projectsTitle")}</a>
+            <a href="#contact" className="btn-outline font-semibold">{t("contactsTitle")}</a>
+          </div>
+        </div>
+
+        <div className="glass-card rounded-3xl p-6 sm:p-8">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+              <p className="text-slate-500 text-sm">Stack</p>
+              <p className="text-slate-900 text-xl mt-2">React / JS / Supabase</p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+              <p className="text-slate-500 text-sm">Focus</p>
+              <p className="text-slate-900 text-xl mt-2">UX + Performance</p>
+            </div>
+            <div className="rounded-2xl bg-sky-50 border border-sky-200 p-4 col-span-2">
+              <p className="text-sky-700 text-sm">Сейчас в работе</p>
+              <p className="text-slate-900 text-lg mt-2">Редизайн, анимации, GitHub/Supabase интеграции</p>
+            </div>
+          </div>
+        </div>
       </div>
-      {!user && (
-        <button
-          className="text-lg mt-8 text-blue-400 hover:underline focus:outline-none bg-transparent border-none cursor-pointer"
-          onClick={() => setShowAuth(true)}
-          type="button"
-        >
-          {t("loginToSeeMore")}
-        </button>
-      )}
-      <div className="mt-4">
-        {/* Переключатель языка удалён, теперь он только в Navbar */}
-      </div>
-      <Auth isOpen={showAuth} onClose={() => setShowAuth(false)} />
     </header>
   );
 };

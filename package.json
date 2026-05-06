@@ -13,6 +13,8 @@
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.8.4",
+    "cheerio": "^1.0.0",
+    "express": "^5.2.1",
     "framer-motion": "^12.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -28,6 +30,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "server": "node server/index.js",
+    "server:dev": "cross-env PORT=8787 node server/index.js",
+    "dev": "concurrently \"npm run server:dev\" \"npm start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -52,6 +57,8 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1"
   }

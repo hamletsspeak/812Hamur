@@ -5,7 +5,8 @@ import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './LocationAutocomplete';
 import { getCityByCoords } from '../utils/geoUtils';
 import { useLanguage } from "../contexts/LanguageContext";
-import { saveUserData } from '../services/databaseService';
+
+const PROFILE_STORAGE_KEY = 'local_profile_data_v1';
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
@@ -57,11 +58,11 @@ const ProfileSetup = () => {
     setError('');
 
     try {
-      await saveUserData(user.uid, {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({
         ...formData,
         email: user.email,
         updatedAt: new Date().toISOString()
-      });
+      }));
 
       navigate('/profile');
     } catch (err) {

@@ -3,7 +3,7 @@ import Auth from './Auth';
 
 const AuthPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#121212]">
+    <div className="min-h-screen flex items-center justify-center bg-[#eef2f7]">
       <div className="w-full max-w-md">
         <Auth isOpen={true} onClose={() => {}} forcePageMode />
       </div>

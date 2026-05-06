@@ -1,13 +1,12 @@
 import React, { lazy, useEffect } from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Navbar";
-import CursorLight from "./CursorLight";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AnimationProvider } from "./config/animations";
 import CachedRoute from "./components/CachedRoute";
-import ProtectedRoute from "./components/ProtectedRoute";
 import CookieConsent from "./components/CookieConsent";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import AIAssistant from "./components/AIAssistant";
 import "./index.css";
 
 // Lazy load components
@@ -16,8 +15,6 @@ const About = lazy(() => import("./About"));
 const Projects = lazy(() => import("./Projects"));
 const Contact = lazy(() => import("./Contact"));
 const Footer = lazy(() => import("./Footer"));
-const Profile = lazy(() => import("./Profile"));
-const ProfileSetup = lazy(() => import("./components/ProfileSetup"));
 const WebGLGame = React.lazy(() => import("./components/WebGLGame"));
 
 function App() {
@@ -48,22 +45,9 @@ function App() {
       <AuthProvider>
         <AnimationProvider>
           <Router>
-            <div className="min-h-screen bg-[#121212]">
-              <CursorLight />
+            <div className="min-h-screen bg-[#eef2f7]">
               <Navbar />
               <Routes>
-                <Route
-                  path="/profile"
-                  element={
-                    <CachedRoute>
-                      <ProtectedRoute>
-                        <div className="pt-16">
-                          <Profile />
-                        </div>
-                      </ProtectedRoute>
-                    </CachedRoute>
-                  }
-                />
                 <Route
                   path="/webgl-game"
                   element={
@@ -73,22 +57,10 @@ function App() {
                   }
                 />
                 <Route
-                  path="/profile-setup"
-                  element={
-                    <CachedRoute>
-                      <ProtectedRoute>
-                        <div className="pt-16">
-                          <ProfileSetup />
-                        </div>
-                      </ProtectedRoute>
-                    </CachedRoute>
-                  }
-                />
-                <Route
                   path="/"
                   element={
                     <CachedRoute>
-                      <main className="h-screen overflow-y-auto sm:overflow-y-visible sm:h-auto sm:snap-none snap-y snap-mandatory">
+                      <main>
                         <Header />
                         <About />
                         <Projects />
@@ -100,6 +72,7 @@ function App() {
                 />
               </Routes>
               <CookieConsent />
+              <AIAssistant />
             </div>
           </Router>
         </AnimationProvider>

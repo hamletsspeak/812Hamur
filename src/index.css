@@ -2,22 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: #f3f5f9;
+  --bg-soft: #e9eef6;
+  --surface: #ffffff;
+  --surface-2: #f8fbff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #dbe5f3;
+  --accent: #ff6a00;
+  --accent-soft: #ffe3cf;
+  --brand: #0ea5e9;
+}
+
 html {
   scroll-behavior: smooth;
-}
-
-@font-face {
-  font-family: "ForestSmooth";
-  src: url("./fonts/HomeVideo-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Minecraft";
-  src: url("./fonts/minecraft_0.ttf") format("opentype");
-  font-weight: normal;
-  font-style: normal;
 }
 
 @font-face {
@@ -26,7 +25,6 @@ html {
        url("./fonts/HomeVideo-Regular.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
-  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+1D2B, U+1D78; /* Кириллица */
 }
 
 @font-face {
@@ -34,7 +32,6 @@ html {
   src: url("./fonts/minecraft.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
-  unicode-range: U+0400-04FF, U+0500-052F, U+2DE0-2DFF, U+A640-A69F, U+1D2B, U+1D78; /* Только кириллица */
 }
 
 @font-face {
@@ -42,98 +39,129 @@ html {
   src: url("./fonts/minecraft_0.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
-  unicode-range: U+0020-007F, U+00A0-00FF; /* Basic Latin + Latin-1 Supplement */
 }
 
-body, html {
-  font-family: 'MinecraftEN', 'MinecraftRU', 'Montserrat', 'HomeVideo-Regular', sans-serif;
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
-.ru-font, [lang="ru"] {
-  font-family: 'MinecraftRU', 'Montserrat', 'HomeVideo-Regular', sans-serif !important;
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 8% 12%, #d7ecff 0%, transparent 28%),
+    radial-gradient(circle at 88% 86%, #ffe8dc 0%, transparent 32%),
+    linear-gradient(180deg, #f7f9fc 0%, #eef3fa 100%);
+  font-family: "HomeVideo-Regular", "MinecraftEN", "MinecraftRU", sans-serif;
 }
 
 .navbar-font {
-  font-family: 'Minecraft', 'HomeVideo-Regular', 'Montserrat', cursive, sans-serif !important;
+  font-family: "HomeVideo-Regular", "MinecraftEN", "MinecraftRU", sans-serif !important;
 }
 
-@keyframes shimmer-glow {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+.ru-font,
+[lang="ru"] {
+  font-family: "MinecraftRU", "HomeVideo-Regular", sans-serif !important;
 }
 
-.shimmer-text {
-  background: linear-gradient(
-    120deg,
-    #ffffff 0%,
-    #ffd700 20%,
-    #ff00cc 40%,
-    #ffd700 60%,
-    #ffffff 80%
-  );
-  background-size: 400% 100%;
-  background-clip: text;
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.section-title {
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+
+.hero-gradient-text {
+  background: linear-gradient(90deg, #0f172a 0%, #0ea5e9 45%, #ff6a00 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
-  animation: shimmer-glow 8s linear infinite;
 }
 
-@keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
+.accent-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  background: var(--accent-soft);
+  color: #b45309;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.animate-pulse {
-  animation: blink 1s infinite;
+.btn-primary {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: 1px solid #0284c7;
+  border-radius: 0.9rem;
+  padding: 0.75rem 1.2rem;
+  transition: 0.2s ease;
 }
 
-.perspective-1000 {
-  perspective: 1000px;
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(14, 165, 233, 0.22);
 }
 
-.preserve-3d {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+.btn-outline {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 0.9rem;
+  padding: 0.75rem 1.2rem;
+  transition: 0.2s ease;
 }
 
-/* Стили для scrollbar */
+.btn-outline:hover {
+  border-color: #93c5fd;
+  color: #0369a1;
+}
+
+.typewriter-effect .typed {
+  opacity: 1;
+  transition: opacity 0.12s linear;
+}
+
+.typewriter-effect .not-typed {
+  opacity: 0.25;
+  transition: opacity 0.12s linear;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1f1f1f;
+  background: #e5ecf7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #9db4d4;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+  background: #6b8dbb;
 }
 
-/* Оптимизации для анимаций */
-.will-change-transform {
-  will-change: transform;
+@media (max-width: 640px) {
+  .mobile-navbar-transparent {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+  }
 }
 
-.hardware-accelerated {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-/* Отключаем анимации для пользователей, которые предпочитают уменьшенное движение */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -143,43 +171,4 @@ body, html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-.transition-opacity {
-  transition: opacity 0.3s ease;
-}
-
-@media (max-width: 640px) {
-  .backdrop-blur-sm, .backdrop-blur, .backdrop-blur-lg {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  .bg-black\/50, .bg-black\/70 {
-    background-color: #000 !important;
-    opacity: 0.95 !important;
-  }
-  .shadow-lg, .shadow-xl, .shadow-2xl {
-    box-shadow: none !important;
-  }
-  .will-change-transform {
-    will-change: auto !important;
-  }
-  .mobile-navbar-transparent {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-  }
-}
-
-.typewriter-effect .typed {
-  opacity: 1;
-  transition: opacity 0.1s linear;
-}
-.typewriter-effect .not-typed {
-  opacity: 0.2;
-  transition: opacity 0.1s linear;
-}
-
-.minecraft-en-font {
-  font-family: 'MinecraftEN', 'MinecraftRU', 'Montserrat', 'HomeVideo-Regular', sans-serif !important;
 }

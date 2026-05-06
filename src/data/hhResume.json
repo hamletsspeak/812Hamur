@@ -1,0 +1,43 @@
+{
+  "source": "pdf",
+  "sourceFile": "src/data/Урушадзе Гамлет (1).pdf",
+  "parsedAt": "2026-05-06T16:30:00.000Z",
+  "fullName": "Урушадзе Гамлет",
+  "title": "Стажер / Программист, разработчик",
+  "area": "Краснодар",
+  "salary": "50 000 ₽ на руки",
+  "contacts": {
+    "phone": "+7 (938) 5558115",
+    "email": "hamlettizer@yandex.ru",
+    "telegram": "@hamletsspeak",
+    "github": "https://github.com/hamletsspeak"
+  },
+  "skills": [
+    "HTML",
+    "CSS",
+    "React Native",
+    "TypeScript",
+    "JavaScript",
+    "Expo",
+    "GitHub",
+    "SQL",
+    "React",
+    "Git",
+    "Frontend",
+    "Верстка"
+  ],
+  "experience": [
+    {
+      "company": "ООО «Альберт Кутуков Бизнес»",
+      "role": "Frontend-разработчик",
+      "period": "Октябрь 2025 — настоящее время",
+      "description": "Разработка гибридного мобильного приложения на React Native Expo, реализация сложных UI-компонентов, интеграция API, хранение и синхронизация прогресса пользователя."
+    },
+    {
+      "company": "Т-Банк",
+      "role": "Оператор чат поддержки",
+      "period": "Сентябрь 2024 — Февраль 2025",
+      "description": "Поддержка юридических лиц в чате по рабочим вопросам сервиса."
+    }
+  ]
+}
