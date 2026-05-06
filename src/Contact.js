@@ -4,13 +4,11 @@ import OptimizedImage from './components/OptimizedImage';
 import gmailIconPath from './icons/gmail-icon.png';
 import telegramIconPath from './icons/telegram-icon.png';
 import { useLanguage } from "./contexts/LanguageContext";
+import resume from "./data/hhResume.json";
 
-const ContactLink = memo(({ href, icon, alt, text }) => (
-  <m.a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="glass-card rounded-2xl p-5 flex items-center gap-4 hover:translate-y-[-2px] transition"
+const SpoilerContactCard = memo(({ icon, alt, label, value }) => (
+  <m.div
+    className="glass-card rounded-2xl p-5 flex items-center gap-4"
     initial={{ opacity: 0, y: 12 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -18,8 +16,15 @@ const ContactLink = memo(({ href, icon, alt, text }) => (
     <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 p-2">
       <OptimizedImage src={icon} alt={alt} width={40} height={40} className="w-full h-full object-contain" />
     </div>
-    <span className="text-slate-700 font-medium">{text}</span>
-  </m.a>
+    <div className="min-w-0">
+      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <span className="text-slate-700 font-medium break-all">
+        <spoiler-span reveal-duration="350" density="10" particle-lifetime="140">
+          {value}
+        </spoiler-span>
+      </span>
+    </div>
+  </m.div>
 ));
 
 const Contact = memo(() => {
@@ -33,17 +38,23 @@ const Contact = memo(() => {
         <p className="text-slate-600 mt-3 text-lg">{t("contactsText")}</p>
 
         <div className="mt-10 grid sm:grid-cols-2 gap-5 max-w-3xl">
-          <ContactLink
-            href="mailto:gamleturusadze@gmail.com"
+          <SpoilerContactCard
             icon={gmailIconPath}
             alt="Gmail"
-            text="gamleturusadze@gmail.com"
+            label="Email"
+            value={resume?.contacts?.email || "Не указано"}
           />
-          <ContactLink
-            href="https://t.me/hamletsspeak"
+          <SpoilerContactCard
+            icon={telegramIconPath}
+            alt="Phone"
+            label="Телефон"
+            value={resume?.contacts?.phone || "Не указано"}
+          />
+          <SpoilerContactCard
             icon={telegramIconPath}
             alt="Telegram"
-            text="@hamletsspeak"
+            label="Telegram"
+            value={resume?.contacts?.telegram || "Не указано"}
           />
         </div>
       </div>

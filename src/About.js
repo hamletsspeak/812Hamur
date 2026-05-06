@@ -23,7 +23,13 @@ const About = () => {
         >
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold text-slate-900">{resume.fullName || "Не указано"}</h3>
+              <h3 className="text-2xl font-bold text-slate-900">
+                {resume.fullName ? (
+                  <spoiler-span reveal-duration="250">{resume.fullName}</spoiler-span>
+                ) : (
+                  "Не указано"
+                )}
+              </h3>
               <p className="text-sky-700 mt-1 font-semibold">{resume.title || "Название резюме не указано"}</p>
             </div>
 
@@ -46,11 +52,23 @@ const About = () => {
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
                   <p className="text-slate-500 text-sm">Телефон</p>
-                  <p className="text-slate-900 mt-1">{resume.contacts.phone || "Не указано"}</p>
+                  <p className="text-slate-900 mt-1">
+                    {resume.contacts.phone ? (
+                      <spoiler-span reveal-duration="250">{resume.contacts.phone}</spoiler-span>
+                    ) : (
+                      "Не указано"
+                    )}
+                  </p>
                 </div>
                 <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
                   <p className="text-slate-500 text-sm">Email</p>
-                  <p className="text-slate-900 mt-1">{resume.contacts.email || "Не указано"}</p>
+                  <p className="text-slate-900 mt-1">
+                    {resume.contacts.email ? (
+                      <spoiler-span reveal-duration="250">{resume.contacts.email}</spoiler-span>
+                    ) : (
+                      "Не указано"
+                    )}
+                  </p>
                 </div>
               </div>
             )}

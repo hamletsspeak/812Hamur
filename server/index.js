@@ -4,8 +4,19 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
-const OPENROUTER_MODELS = (process.env.OPENROUTER_MODELS || 'openrouter/free,meta-llama/llama-3.2-3b-instruct:free,google/gemma-3-4b-it:free,qwen/qwen3-30b-a3b:free')
+const ASSISTANT_SYSTEM_PROMPT = `
+Ты ассистент персонального сайта-визитки Hamlet Urushadze (hamletsspeak).
+Отвечай только по темам, связанным с владельцем сайта и его контентом:
+- навыки, опыт, проекты, резюме, стек, контакты;
+- навигация по этому сайту и пояснение разделов.
+Не придумывай факты. Если данных на сайте недостаточно, так и скажи и предложи связаться через контакты.
+Если вопрос не связан с владельцем сайта или содержимым сайта, вежливо откажись и верни разговор к темам сайта.
+Отвечай кратко, по делу, на русском языке.
+Если не хватает данных или тема не относится к сайту, используй только этот шаблон:
+"Я отвечаю только по информации этого сайта о Гамлете Урушадзе. Уточните вопрос по разделам: опыт, навыки, проекты, резюме, контакты."
+`.trim();
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'google/gemma-3-4b-it:free';
+const OPENROUTER_MODELS = (process.env.OPENROUTER_MODELS || 'google/gemma-3-4b-it:free,meta-llama/llama-3.2-3b-instruct:free,qwen/qwen3-30b-a3b:free,openrouter/free')
   .split(',')
   .map((model) => model.trim())
   .filter(Boolean);
@@ -51,8 +62,10 @@ app.post('/api/ai', async (req, res) => {
       const modelForAttempt = modelChain[attempt % modelChain.length];
       const payload = {
         model: modelForAttempt,
+        temperature: 0.2,
+        max_tokens: 180,
         messages: [
-          { role: 'system', content: 'Ты полезный и краткий AI-ассистент сайта.' },
+          { role: 'system', content: ASSISTANT_SYSTEM_PROMPT },
           ...history,
           { role: 'user', content: message }
         ]
