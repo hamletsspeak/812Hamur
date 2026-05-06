@@ -29,9 +29,25 @@ create table if not exists public.user_indices (
   user_index bigint not null
 );
 
+create table if not exists public.site_ratings (
+  id bigint generated always as identity primary key,
+  client_id text not null,
+  rating smallint not null check (rating between 1 and 5),
+  created_at timestamptz not null default now()
+);
+
+alter table public.site_ratings add column if not exists client_id text;
+update public.site_ratings
+set client_id = concat('legacy_', id::text)
+where client_id is null;
+alter table public.site_ratings alter column client_id set not null;
+
+create unique index if not exists site_ratings_client_id_uidx on public.site_ratings (client_id);
+
 alter table public.users enable row level security;
 alter table public.counters enable row level security;
 alter table public.user_indices enable row level security;
+alter table public.site_ratings enable row level security;
 
 drop policy if exists "users_select_own" on public.users;
 create policy "users_select_own" on public.users
@@ -52,3 +68,7 @@ for all to authenticated using (true) with check (true);
 drop policy if exists "user_indices_rw_own" on public.user_indices;
 create policy "user_indices_rw_own" on public.user_indices
 for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "site_ratings_insert_anon" on public.site_ratings;
+create policy "site_ratings_insert_anon" on public.site_ratings
+for insert to anon, authenticated with check (true);

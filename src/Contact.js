@@ -1,9 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo } from "react";
 import { m } from "framer-motion";
-import OptimizedImage from './components/OptimizedImage';
-import gmailIconPath from './icons/gmail-icon.png';
-import telegramIconPath from './icons/telegram-icon.png';
-import { useLanguage } from "./contexts/LanguageContext";
+import OptimizedImage from "./components/OptimizedImage";
+import gmailIconPath from "./icons/gmail-icon.png";
+import telegramIconPath from "./icons/telegram-icon.png";
 import resume from "./data/hhResume.json";
 
 const SpoilerContactCard = memo(({ icon, alt, label, value }) => (
@@ -28,15 +27,10 @@ const SpoilerContactCard = memo(({ icon, alt, label, value }) => (
 ));
 
 const Contact = memo(() => {
-  const { t } = useLanguage();
-
   return (
     <section id="contact" className="snap-start min-h-screen px-5 py-24">
       <div className="max-w-6xl mx-auto">
-        <span className="accent-pill">Connect</span>
-        <h2 className="section-title mt-4 text-slate-900 font-bold">{t("contactsTitle")}</h2>
-        <p className="text-slate-600 mt-3 text-lg">{t("contactsText")}</p>
-
+        <h2 className="section-title text-slate-900 font-bold">Мои контакты</h2>
         <div className="mt-10 grid sm:grid-cols-2 gap-5 max-w-3xl">
           <SpoilerContactCard
             icon={gmailIconPath}

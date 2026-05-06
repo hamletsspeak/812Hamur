@@ -3,9 +3,11 @@ import { m } from "framer-motion";
 import { fadeInFromLeftVariant, useScrollAnimation } from "./config/animations";
 import { useLanguage } from "./contexts/LanguageContext";
 import resume from "./data/hhResume.json";
+import resumePhoto from "./icons/кот.jpg";
 
 const About = () => {
   const { t } = useLanguage();
+  const hiddenCompanies = new Set(["ООО «Альберт Кутуков Бизнес»", "Т-Банк"]);
 
   return (
     <section id="about" className="snap-start min-h-screen px-5 py-24">
@@ -22,25 +24,44 @@ const About = () => {
           {...useScrollAnimation()}
         >
           <div className="space-y-6">
-            <div>
-              <h3 className="text-2xl font-bold text-slate-900">
-                {resume.fullName ? (
-                  <spoiler-span reveal-duration="250">{resume.fullName}</spoiler-span>
-                ) : (
-                  "Не указано"
-                )}
-              </h3>
-              <p className="text-sky-700 mt-1 font-semibold">{resume.title || "Название резюме не указано"}</p>
+            <div className="flex items-start gap-4">
+              <img
+                src={resumePhoto}
+                alt="Фото для резюме"
+                className="h-20 w-20 rounded-2xl object-cover border border-slate-200"
+              />
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {resume.fullName ? (
+                    <spoiler-span reveal-duration="250">{resume.fullName}</spoiler-span>
+                  ) : (
+                    "Не указано"
+                  )}
+                </h3>
+                <p className="text-sky-700 mt-1 font-semibold">{resume.title || "Название резюме не указано"}</p>
+              </div>
             </div>
 
             <div className="grid sm:grid-cols-3 gap-3">
               <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
                 <p className="text-slate-500 text-sm">Город</p>
-                <p className="text-slate-900 mt-1">{resume.area || "Не указано"}</p>
+                <p className="text-slate-900 mt-1">
+                  {resume.area ? (
+                    <spoiler-span reveal-duration="250">{resume.area}</spoiler-span>
+                  ) : (
+                    "Не указано"
+                  )}
+                </p>
               </div>
               <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
                 <p className="text-slate-500 text-sm">Зарплатные ожидания</p>
-                <p className="text-slate-900 mt-1">{resume.salary || "Не указано"}</p>
+                <p className="text-slate-900 mt-1">
+                  {resume.salary ? (
+                    <spoiler-span reveal-duration="250">{resume.salary}</spoiler-span>
+                  ) : (
+                    "Не указано"
+                  )}
+                </p>
               </div>
               <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
                 <p className="text-slate-500 text-sm">Обновлено</p>
@@ -89,7 +110,13 @@ const About = () => {
               <div className="space-y-3">
                 {(resume.experience?.length ? resume.experience : [{ company: "Нет данных", role: "", period: "", description: "" }]).map((job, idx) => (
                   <div key={`${job.company}-${idx}`} className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="font-semibold text-slate-900">{job.company}</p>
+                    <p className="font-semibold text-slate-900">
+                      {hiddenCompanies.has(job.company) ? (
+                        <spoiler-span reveal-duration="250">{job.company}</spoiler-span>
+                      ) : (
+                        job.company
+                      )}
+                    </p>
                     <p className="text-sky-700 text-sm mt-1">{job.role}</p>
                     <p className="text-slate-500 text-sm mt-1">{job.period}</p>
                     {job.description && <p className="text-slate-600 mt-2 text-sm">{job.description}</p>}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { m, AnimatePresence } from "framer-motion";
 import { useLanguage } from "./contexts/LanguageContext";
+import resumePhoto from "./icons/кот.jpg";
 
 const NavLink = ({ to, onClick, children }) => (
   <li>
@@ -67,11 +68,15 @@ const Navbar = () => {
       <m.nav
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`fixed top-0 left-0 w-full z-50 px-4 sm:px-8 py-4 bg-white/85 backdrop-blur-xl border-b border-slate-200 navbar-font ${typeof window !== 'undefined' && window.innerWidth <= 640 ? 'mobile-navbar-transparent' : ''}`}
+        className={`fixed top-0 left-0 w-full z-50 px-4 sm:px-8 py-4 bg-white/55 backdrop-blur-2xl [backdrop-filter:saturate(180%)_blur(20px)] border-b border-white/60 shadow-[0_8px_30px_rgba(15,23,42,0.08)] navbar-font ${typeof window !== 'undefined' && window.innerWidth <= 640 ? 'mobile-navbar-transparent' : ''}`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <button onClick={handleLogoClick} className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-orange-400" />
+            <img
+              src={resumePhoto}
+              alt="Фото профиля"
+              className="w-8 h-8 rounded-lg object-cover border border-slate-200"
+            />
             <span className="text-slate-900 font-bold tracking-wide text-lg">hamletsspeak</span>
           </button>
 
