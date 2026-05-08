@@ -13,13 +13,17 @@ export const CachedRoute = ({ children }) => {
 
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-        <div className="space-y-4 w-full max-w-md p-4">
-          <div className="h-8 bg-gray-700 rounded-lg animate-pulse"></div>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-700 rounded w-3/4 animate-pulse"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2 animate-pulse"></div>
-          </div>
+      <div className="relative min-h-screen overflow-hidden bg-[#eef2f7] flex items-center justify-center px-5">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-24 -left-24 h-[420px] w-[420px] rounded-full bg-sky-100/80 blur-3xl" />
+          <div className="absolute top-[22%] right-[-120px] h-[360px] w-[360px] rounded-full bg-violet-100/70 blur-3xl" />
+          <div className="absolute bottom-[-120px] left-[18%] h-[380px] w-[380px] rounded-full bg-amber-50/80 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/30 to-transparent" />
+        </div>
+        <div className="w-full max-w-[640px] animate-pulse">
+          <div className="mx-auto h-10 w-[86%] rounded-xl bg-gradient-to-r from-slate-300/80 via-slate-200/70 to-slate-300/80" />
+          <div className="mx-auto mt-5 h-6 w-[62%] rounded-lg bg-gradient-to-r from-slate-300/70 via-slate-200/65 to-slate-300/70" />
+          <div className="mx-auto mt-4 h-6 w-[42%] rounded-lg bg-gradient-to-r from-slate-300/65 via-slate-200/60 to-slate-300/65" />
         </div>
       </div>
     }>

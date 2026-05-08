@@ -1,10 +1,8 @@
 import axios from 'axios';
-import { askOpenRouter } from './openRouterService';
 
 const GITHUB_API_URL = 'https://api.github.com';
 const GITHUB_OWNER = 'hamletsspeak';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
-const MAX_README_LENGTH = 4000;
 
 class Cache {
   constructor() {
@@ -38,139 +36,29 @@ class Cache {
 
 const cache = new Cache();
 
-const decodeBase64 = (value) => {
-  const binary = atob(value.replace(/\n/g, ''));
-  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-  return new TextDecoder('utf-8').decode(bytes);
+const PROJECT_DESCRIPTIONS = {
+  '812Hamur': 'Персональный сайт-портфолио на React с резюме, GitHub-проектами, контактами, AI-ассистентом и встроенной WebGL-игрой March3. Проект объединяет витрину опыта, интерактивные разделы и практику работы с frontend, API и пользовательскими сценариями.',
+  'stris-labs': 'Набор лабораторных работ по современным технологиям разработки информационных систем: REST API, reverse proxy, балансировка, кэширование, транзакции, репликация и брокеры сообщений.',
+  'sasagram': 'Next.js-сайт-визитка стримера SASAVOT с расписанием, Twitch-клипами, записями стримов, агрегированными статусами площадок и анонимной системой рейтинга.',
+  'HamoTraining': 'Приложение для учёта тренировок, воды и добавок: помогает отслеживать прогресс, хранить упражнения и получать аналитические инсайты по занятиям.',
+  'InfoSystemsDesign': 'Учебный проект по проектированию информационных систем на примере ломбарда: модели клиентов, залогов, финансовых операций и базы данных.',
+  'Frontend-labs': 'Коллекция фронтенд-лабораторных и ранняя версия персонального сайта на HTML, CSS и JavaScript, размещаемого через GitHub Pages.',
+  'testovoe_saper': 'Браузерная реализация классического “Сапёра” на HTML, CSS и JavaScript с открытием соседних клеток, доработанной логикой ходов и финальным UI.',
+  'magazin': 'Next.js-проект интернет-магазина, построенный на App Router и TypeScript как основа для витрины, страниц товаров и дальнейшей e-commerce-логики.',
+  'SecurityHam': 'Лабораторные работы по криптографии на Python: реализации шифра Цезаря, AES, RSA и сопутствующие задания по шифрованию и дешифрованию текста.',
+  'Go-labs': 'Учебный репозиторий на Go с лабораторными работами по синтаксису, структуре проектов, сетевым сервисам, конкурентности и базовым backend-подходам.',
+  'Rails-App': 'Прототип социальной сети в стиле Instagram на Ruby on Rails с регистрацией, профилями, публикациями, загрузкой изображений и административными возможностями.',
+  'krd-practice': 'Практические задания летней Ruby-практики: серия уроков с упражнениями, скриптами и закреплением базовых возможностей языка.',
+  'university-labworks-python': 'Университетские лабораторные работы по Python: практические задания, домашние работы и примеры по основным темам курса.'
 };
 
-const cleanGeneratedDescription = (value) =>
-  (value || '')
-    .replace(/[‐‑‒–—]/g, '-')
-    .replace(/\*\*/g, '')
-    .replace(/^[-*]\s*/, '')
-    .replace(/^Это(?=[А-Яа-яA-Za-z])/i, 'Это ')
-    .replace(/^["'«]+|["'»]+$/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-const splitTokens = (value) =>
-  (value || '')
-    .toLowerCase()
-    .replace(/[^a-zа-я0-9+#.\s-]/gi, ' ')
-    .split(/[\s/_-]+/)
-    .map((token) => token.trim())
-    .filter((token) => token.length >= 3);
-
-const uniq = (items) => [...new Set(items)];
-
-const pickTopKeywords = (repo, readme) => {
-  const stopWords = new Set([
-    'the', 'and', 'for', 'with', 'from', 'that', 'this', 'your', 'you', 'are', 'was', 'were',
-    'или', 'как', 'что', 'для', 'это', 'про', 'без', 'под', 'над', 'при', 'есть', 'будет',
-    'учебный', 'проект', 'pet', 'github', 'repo', 'repository', 'readme'
-  ]);
-
-  const tokenMap = new Map();
-  const sourceTokens = [
-    ...splitTokens(repo.name),
-    ...splitTokens(repo.language),
-    ...(repo.topics || []).flatMap(splitTokens),
-    ...splitTokens(repo.description),
-    ...splitTokens(readme).slice(0, 500)
-  ];
-
-  sourceTokens.forEach((token) => {
-    if (stopWords.has(token)) return;
-    tokenMap.set(token, (tokenMap.get(token) || 0) + 1);
-  });
-
-  return [...tokenMap.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([token]) => token);
-};
-
-const buildLocalDescription = (repo, readme) => {
-  const topics = uniq((repo.topics || []).map((topic) => topic.trim()).filter(Boolean)).slice(0, 3);
-  const keywords = pickTopKeywords(repo, readme).slice(0, 3);
+const buildDefaultDescription = (repo) => {
   const language = repo.language ? ` на ${repo.language}` : '';
-
-  if (topics.length > 0) {
-    return `Проект${language} по теме ${topics.join(', ')}. Репозиторий развивается и отражает практические задачи автора.`;
-  }
-
-  if (keywords.length > 0) {
-    return `Проект${language}, сфокусированный на ${keywords.join(', ')}. Создан для практики и применения рабочих подходов.`;
-  }
-
-  return `Проект${language} с открытым исходным кодом на GitHub, созданный для практики и развития инженерных навыков.`;
+  return `Проект${language} из GitHub-портфолио с открытым исходным кодом и практической разработкой.`;
 };
 
-const getRepositoryReadme = async (repoName, headers) => {
-  try {
-    const { data } = await axios.get(`${GITHUB_API_URL}/repos/${GITHUB_OWNER}/${repoName}/readme`, {
-      headers,
-      timeout: 10000
-    });
-
-    if (!data?.content) return '';
-    return decodeBase64(data.content).slice(0, MAX_README_LENGTH);
-  } catch (error) {
-    return '';
-  }
-};
-
-const generateDescriptionFromGithub = async (repo, readme) => {
-  const prompt = `
-Сгенерируй короткое описание проекта для портфолио на русском языке.
-Используй только данные GitHub ниже. Не придумывай факты, которых нет в данных.
-Верни только готовое описание без заголовков, кавычек, markdown и списков.
-Не начинай с "Это", "Данный проект", "Портфолио-проект" или названия репозитория.
-Не перечисляй стек через запятую, если он явно не описан в README.
-Стиль: естественно, просто, 1-2 предложения, до 180 символов.
-
-Название репозитория: ${repo.name}
-Язык: ${repo.language || 'не указан'}
-Темы: ${repo.topics?.length ? repo.topics.join(', ') : 'не указаны'}
-GitHub description: ${repo.description || 'отсутствует'}
-README:
-${readme || 'README отсутствует или недоступен'}
-`.trim();
-
-  const description = await askOpenRouter(prompt);
-  return cleanGeneratedDescription(description);
-};
-
-const getFallbackDescription = (repo, readme = '') => buildLocalDescription(repo, readme);
-
-const enrichRepository = async (repo, headers) => {
-  if (repo.description) {
-    return repo;
-  }
-
-  try {
-    const readme = await getRepositoryReadme(repo.name, headers);
-    const generatedDescription = await generateDescriptionFromGithub(repo, readme);
-    const fallbackDescription = getFallbackDescription(repo, readme);
-    const finalDescription = generatedDescription || fallbackDescription;
-    const descriptionSource = generatedDescription ? 'ai' : 'fallback';
-
-    return {
-      ...repo,
-      description: finalDescription,
-      descriptionSource
-    };
-  } catch (error) {
-    console.warn(`Не удалось сгенерировать описание для ${repo.name}:`, error);
-    const readme = await getRepositoryReadme(repo.name, headers);
-    return {
-      ...repo,
-      description: getFallbackDescription(repo, readme),
-      descriptionSource: 'fallback'
-    };
-  }
-};
+const getProjectDescription = (repo) =>
+  PROJECT_DESCRIPTIONS[repo.name] || repo.description || buildDefaultDescription(repo);
 
 export const getRepositories = async () => {
   try {
@@ -210,9 +98,12 @@ export const getRepositories = async () => {
           updatedAt: new Date(repo.updated_at)
         }));
 
-      const processedData = (await Promise.all(
-        repositories.map((repo) => enrichRepository(repo, headers))
-      )).sort((a, b) => b.updatedAt - a.updatedAt);
+      const processedData = repositories
+        .map((repo) => ({
+          ...repo,
+          description: getProjectDescription(repo)
+        }))
+        .sort((a, b) => b.updatedAt - a.updatedAt);
 
       if (processedData.length > 0) {
         console.log('Обработано репозиториев:', processedData.length);

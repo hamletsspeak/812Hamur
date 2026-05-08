@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import aiGif from "../icons/Без названия.gif";
+import aiGif from "../icons/ai-assistant-sticker-v2.gif";
 
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);

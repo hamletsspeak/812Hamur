@@ -3,7 +3,7 @@ import hiddenVideo from "./icons/09cb2a5fe3b0ca1cee32fda8ce04c218_t4.mp4";
 import memeKaif from "./icons/mems/кайф.jpg";
 import memeThree from "./icons/mems/1 Стикер телеграм 🙂 из набора «Bluemoji or Joobi».jpg";
 import memeTwo from "./icons/mems/Без названия (7).jpg";
-import memeOneA from "./icons/mems/#memes #fyp #whisper.jpg";
+import memeOneA from "./icons/mems/meme-one-a.jpg";
 import memeOneB from "./icons/mems/Без названия (5).jpg";
 import memeOneC from "./icons/mems/Без названия (4).jpg";
 import memeOneD from "./icons/mems/-aura.jpg";
@@ -237,8 +237,8 @@ const SecretVideoSection = () => {
             )}
           </div>
 
-          <div className="mt-5 min-h-[340px] flex items-start justify-center">
-            <div className="w-full max-w-md h-[340px] rounded-2xl border border-slate-300 bg-slate-100 overflow-hidden flex items-center justify-center">
+          <div className="mt-5 min-h-[260px] sm:min-h-[340px] flex items-start justify-center">
+            <div className="w-full max-w-md h-[260px] sm:h-[340px] rounded-2xl border border-slate-300 bg-slate-100 overflow-hidden flex items-center justify-center">
               {showVideo ? (
                 <video
                   ref={videoRef}

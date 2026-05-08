@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { m } from "framer-motion";
 import OptimizedImage from "./components/OptimizedImage";
-import yandexIconPath from "./icons/yandex-icon.svg";
+import yandexIconPath from "./icons/icons8-яндекс-почта-67.png";
 import phoneIconPath from "./icons/phone-icon.svg";
 import telegramIconPath from "./icons/telegram-icon.png";
 import resume from "./data/hhResume.json";

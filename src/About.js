@@ -24,21 +24,21 @@ const About = () => {
           {...useScrollAnimation()}
         >
           <div className="space-y-6">
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 min-w-0">
               <img
                 src={resumePhoto}
                 alt="Фото для резюме"
                 className="h-20 w-20 rounded-2xl object-cover border border-slate-200"
               />
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900">
+              <div className="min-w-0">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 break-words">
                   {resume.fullName ? (
                     <spoiler-span reveal-duration="250">{resume.fullName}</spoiler-span>
                   ) : (
                     "Не указано"
                   )}
                 </h3>
-                <p className="text-sky-700 mt-1 font-semibold">{resume.title || "Название резюме не указано"}</p>
+                <p className="text-sky-700 mt-1 font-semibold break-words">{resume.title || "Название резюме не указано"}</p>
               </div>
             </div>
 
@@ -110,14 +110,14 @@ const About = () => {
               <div className="space-y-3">
                 {(resume.experience?.length ? resume.experience : [{ company: "Нет данных", role: "", period: "", description: "" }]).map((job, idx) => (
                   <div key={`${job.company}-${idx}`} className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-slate-900 break-words">
                       {hiddenCompanies.has(job.company) ? (
                         <spoiler-span reveal-duration="250">{job.company}</spoiler-span>
                       ) : (
                         job.company
                       )}
                     </p>
-                    <p className="text-sky-700 text-sm mt-1">{job.role}</p>
+                    <p className="text-sky-700 text-sm mt-1 break-words">{job.role}</p>
                     <p className="text-slate-500 text-sm mt-1">{job.period}</p>
                     {job.description && <p className="text-slate-600 mt-2 text-sm">{job.description}</p>}
                   </div>
