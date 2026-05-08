@@ -1,6 +1,8 @@
 import React from "react";
 import resume from "./data/hhResume.json";
 import heroVideo from "./icons/anim_duck-v2.webm";
+import heroStickerMobileWebp from "./icons/anim_duck-v2-mobile.webp";
+import heroStickerMobilePng from "./icons/anim_duck-v2-mobile.png";
 
 const Header = () => {
   return (
@@ -45,7 +47,7 @@ const Header = () => {
         </div>
         <div className="mt-6 flex justify-center">
           <video
-            className="w-36 sm:w-40 md:w-44"
+            className="hidden sm:block w-36 sm:w-40 md:w-44 bg-transparent"
             autoPlay
             loop
             muted
@@ -53,6 +55,14 @@ const Header = () => {
           >
             <source src={heroVideo} type="video/webm" />
           </video>
+          <picture className="block sm:hidden w-36">
+            <source srcSet={heroStickerMobileWebp} type="image/webp" />
+            <img
+              src={heroStickerMobilePng}
+              alt="Стикер с уткой за ноутбуком"
+              className="w-full h-auto"
+            />
+          </picture>
         </div>
       </div>
     </header>

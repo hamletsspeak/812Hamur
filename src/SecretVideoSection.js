@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import hiddenVideo from "./icons/09cb2a5fe3b0ca1cee32fda8ce04c218_t4.mp4";
 import memeKaif from "./icons/mems/кайф.jpg";
 import memeThree from "./icons/mems/1 Стикер телеграм 🙂 из набора «Bluemoji or Joobi».jpg";
@@ -11,7 +11,7 @@ import memeOneE from "./icons/mems/★.jpg";
 import memeOneF from "./icons/mems/Без названия (6).jpg";
 import memeOneG from "./icons/mems/omg.jpg";
 import memeOneH from "./icons/mems/Dunbahh.jpg";
-import { saveSiteRating } from "./services/ratingService";
+import { getStoredSiteRating, saveSiteRating } from "./services/ratingService";
 
 const SecretVideoSection = () => {
   const videoRef = useRef(null);
@@ -20,6 +20,7 @@ const SecretVideoSection = () => {
   const [statusText, setStatusText] = useState("");
   const [error, setError] = useState("");
   const [showVideo, setShowVideo] = useState(false);
+  const [isRatingLocked, setIsRatingLocked] = useState(false);
   const [oneClickIndex, setOneClickIndex] = useState(0);
   const [oneMeme, setOneMeme] = useState(null);
   const [oneEvadeMode, setOneEvadeMode] = useState(false);
@@ -46,9 +47,25 @@ const SecretVideoSection = () => {
           ? memeThree
           : selectedRating === 4
             ? memeKaif
-            : null;
+          : null;
+
+  useEffect(() => {
+    const stored = getStoredSiteRating();
+    if (!stored.locked) return;
+
+    setIsRatingLocked(true);
+    if (stored.rating) {
+      setSelectedRating(stored.rating);
+    }
+    setStatusText("Спасибо, первая оценка уже сохранена.");
+  }, []);
 
   const handleRate = async (rating) => {
+    if (isRatingLocked) {
+      setStatusText("Первая оценка уже сохранена.");
+      return;
+    }
+
     if (rating === 1) {
       setOneButtonStyle({ transform: "translate(0px, 0px)", opacity: 1 });
       if (oneConvertedToFive) {
@@ -90,8 +107,10 @@ const SecretVideoSection = () => {
     try {
       const result = await saveSiteRating(rating);
       if (result.saved) {
+        setIsRatingLocked(true);
         setStatusText("Спасибо, первая оценка сохранена.");
       } else {
+        setIsRatingLocked(true);
         setStatusText("Оценка уже была сохранена ранее. Можно нажимать дальше для реакций.");
       }
     } catch (error) {
@@ -126,8 +145,10 @@ const SecretVideoSection = () => {
     try {
       const result = await saveSiteRating(5);
       if (result.saved) {
+        setIsRatingLocked(true);
         setStatusText("Спасибо, первая оценка сохранена.");
       } else {
+        setIsRatingLocked(true);
         setStatusText("Оценка уже была сохранена ранее. Можно нажимать дальше для реакций.");
       }
     } catch (saveError) {
@@ -192,7 +213,7 @@ const SecretVideoSection = () => {
               onMouseLeave={() => setIsOneHovered(false)}
               onFocus={() => setIsOneHovered(true)}
               onBlur={() => setIsOneHovered(false)}
-              disabled={isSaving}
+              disabled={isSaving || isRatingLocked}
               style={oneButtonStyle}
               className={`relative z-10 h-12 w-12 rounded-xl border text-lg font-bold transition-all duration-150 ${
                 selectedRating >= 1
@@ -208,7 +229,7 @@ const SecretVideoSection = () => {
                 key={value}
                 type="button"
                 onClick={() => handleRate(value)}
-                disabled={isSaving}
+                disabled={isSaving || isRatingLocked}
                 className={`h-12 w-12 rounded-xl border text-lg font-bold transition-all ${
                   selectedRating >= value
                     ? "border-sky-500 bg-sky-100 text-sky-700"
