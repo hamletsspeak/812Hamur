@@ -88,8 +88,6 @@ export const saveSiteRating = async (rating) => {
     throw new Error("Некорректная оценка");
   }
 
-  const stored = getStoredSiteRating();
-
   const clientId = getRatingClientId();
 
   const trySaveWithClientId = async () =>
