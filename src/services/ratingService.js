@@ -89,16 +89,13 @@ export const saveSiteRating = async (rating) => {
   }
 
   const stored = getStoredSiteRating();
-  if (stored.locked) {
-    return { saved: false, alreadyRated: true, rating: stored.rating || rating };
-  }
 
   const clientId = getRatingClientId();
 
   const trySaveWithClientId = async () =>
     supabase
       .from("site_ratings")
-      .upsert({ rating, client_id: clientId }, { onConflict: "client_id", ignoreDuplicates: true })
+      .upsert({ rating, client_id: clientId }, { onConflict: "client_id" })
       .select("id, rating");
 
   const trySaveWithoutClientId = async () =>
@@ -120,7 +117,7 @@ export const saveSiteRating = async (rating) => {
 
   return {
     saved,
-    alreadyRated: !saved,
-    rating: saved ? rating : stored.rating || rating,
+    alreadyRated: false,
+    rating,
   };
 };

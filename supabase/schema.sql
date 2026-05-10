@@ -72,3 +72,7 @@ for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = u
 drop policy if exists "site_ratings_insert_anon" on public.site_ratings;
 create policy "site_ratings_insert_anon" on public.site_ratings
 for insert to anon, authenticated with check (true);
+
+drop policy if exists "site_ratings_update_anon" on public.site_ratings;
+create policy "site_ratings_update_anon" on public.site_ratings
+for update to anon, authenticated using (true) with check (true);

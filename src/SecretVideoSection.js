@@ -20,7 +20,6 @@ const SecretVideoSection = () => {
   const [statusText, setStatusText] = useState("");
   const [error, setError] = useState("");
   const [showVideo, setShowVideo] = useState(false);
-  const [isRatingLocked, setIsRatingLocked] = useState(false);
   const [oneClickIndex, setOneClickIndex] = useState(0);
   const [oneMeme, setOneMeme] = useState(null);
   const [oneEvadeMode, setOneEvadeMode] = useState(false);
@@ -51,21 +50,13 @@ const SecretVideoSection = () => {
 
   useEffect(() => {
     const stored = getStoredSiteRating();
-    if (!stored.locked) return;
-
-    setIsRatingLocked(true);
     if (stored.rating) {
       setSelectedRating(stored.rating);
+      setStatusText("Оценка загружена. Можно изменить в любой момент.");
     }
-    setStatusText("Спасибо, первая оценка уже сохранена.");
   }, []);
 
   const handleRate = async (rating) => {
-    if (isRatingLocked) {
-      setStatusText("Первая оценка уже сохранена.");
-      return;
-    }
-
     if (rating === 1) {
       setOneButtonStyle({ transform: "translate(0px, 0px)", opacity: 1 });
       if (oneConvertedToFive) {
@@ -107,11 +98,9 @@ const SecretVideoSection = () => {
     try {
       const result = await saveSiteRating(rating);
       if (result.saved) {
-        setIsRatingLocked(true);
-        setStatusText("Спасибо, первая оценка сохранена.");
+        setStatusText("Спасибо, оценка сохранена. Ее можно изменить.");
       } else {
-        setIsRatingLocked(true);
-        setStatusText("Оценка уже была сохранена ранее. Можно нажимать дальше для реакций.");
+        setStatusText("Оценка обновлена.");
       }
     } catch (error) {
       setError("");
@@ -145,11 +134,9 @@ const SecretVideoSection = () => {
     try {
       const result = await saveSiteRating(5);
       if (result.saved) {
-        setIsRatingLocked(true);
-        setStatusText("Спасибо, первая оценка сохранена.");
+        setStatusText("Спасибо, оценка сохранена. Ее можно изменить.");
       } else {
-        setIsRatingLocked(true);
-        setStatusText("Оценка уже была сохранена ранее. Можно нажимать дальше для реакций.");
+        setStatusText("Оценка обновлена.");
       }
     } catch (saveError) {
       setShowVideo(false);
@@ -213,7 +200,7 @@ const SecretVideoSection = () => {
               onMouseLeave={() => setIsOneHovered(false)}
               onFocus={() => setIsOneHovered(true)}
               onBlur={() => setIsOneHovered(false)}
-              disabled={isSaving || isRatingLocked}
+              disabled={isSaving}
               style={oneButtonStyle}
               className={`relative z-10 h-12 w-12 rounded-xl border text-lg font-bold transition-all duration-150 ${
                 selectedRating >= 1
@@ -229,7 +216,7 @@ const SecretVideoSection = () => {
                 key={value}
                 type="button"
                 onClick={() => handleRate(value)}
-                disabled={isSaving || isRatingLocked}
+                disabled={isSaving}
                 className={`h-12 w-12 rounded-xl border text-lg font-bold transition-all ${
                   selectedRating >= value
                     ? "border-sky-500 bg-sky-100 text-sky-700"
