@@ -15,7 +15,6 @@ const About = () => {
         <div className="lg:col-span-1">
           <span className="accent-pill">Резюме</span>
           <h2 className="section-title mt-4 font-bold text-slate-900">{t("aboutTitle")}</h2>
-          <p className="text-slate-600 mt-4">Данные извлекаются из PDF-резюме перед запуском/сборкой.</p>
         </div>
 
         <m.div
