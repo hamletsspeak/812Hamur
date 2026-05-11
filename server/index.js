@@ -1,5 +1,8 @@
 const express = require('express');
 const path = require('path');
+const cheerio = require('cheerio');
+const pdfParse = require('pdf-parse');
+const mammoth = require('mammoth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,7 +42,124 @@ const buildModelChain = () => {
   return [primary, ...fallback];
 };
 
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '20mb' }));
+
+const handleVacancyExtract = async (req, res) => {
+  try {
+    const { url } = req.body || {};
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ error: 'url is required' });
+    }
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL format' });
+    }
+
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return res.status(400).json({ error: 'Only http/https URLs are allowed' });
+    }
+
+    const response = await fetch(parsedUrl.toString(), {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; ResumeMatchBot/1.0)',
+        Accept: 'text/html,application/xhtml+xml'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: `Failed to fetch vacancy page (${response.status})` });
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    $('script, style, noscript').remove();
+
+    const title = $('h1').first().text().trim() || $('title').text().trim();
+    const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
+    const text = `${title}\n\n${bodyText}`.trim();
+
+    if (!text) {
+      return res.status(422).json({ error: 'Could not extract text from this page' });
+    }
+
+    return res.json({
+      sourceUrl: parsedUrl.toString(),
+      title,
+      text: text.slice(0, 50000)
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || 'Failed to extract vacancy text' });
+  }
+};
+
+app.post('/api/vacancy/extract', handleVacancyExtract);
+app.post('/api/vacancy', handleVacancyExtract);
+
+const decodeBase64File = (base64) => {
+  if (!base64 || typeof base64 !== 'string') return null;
+  const pure = base64.includes(',') ? base64.split(',').pop() : base64;
+  return Buffer.from(pure, 'base64');
+};
+
+const extractTextFromBuffer = async (buffer, fileName = '', mimeType = '') => {
+  const loweredName = (fileName || '').toLowerCase();
+  const loweredMime = (mimeType || '').toLowerCase();
+
+  if (
+    loweredMime.startsWith('text/') ||
+    ['.txt', '.md', '.csv', '.json', '.log', '.rtf'].some((ext) => loweredName.endsWith(ext))
+  ) {
+    return buffer.toString('utf-8');
+  }
+
+  if (loweredMime.includes('pdf') || loweredName.endsWith('.pdf')) {
+    const parsed = await pdfParse(buffer);
+    return parsed?.text || '';
+  }
+
+  if (
+    loweredMime.includes('wordprocessingml') ||
+    loweredName.endsWith('.docx')
+  ) {
+    const parsed = await mammoth.extractRawText({ buffer });
+    return parsed?.value || '';
+  }
+
+  throw new Error('Unsupported file format. Supported: txt, md, csv, json, log, rtf, pdf, docx');
+};
+
+const handleVacancyFileExtract = async (req, res) => {
+  try {
+    const { fileName, mimeType, base64 } = req.body || {};
+    if (!fileName || !base64) {
+      return res.status(400).json({ error: 'fileName and base64 are required' });
+    }
+
+    const buffer = decodeBase64File(base64);
+    if (!buffer) {
+      return res.status(400).json({ error: 'Invalid base64 content' });
+    }
+
+    const text = await extractTextFromBuffer(buffer, fileName, mimeType);
+    if (!text || !text.trim()) {
+      return res.status(422).json({ error: 'Could not extract text from this file' });
+    }
+
+    return res.json({
+      sourceFile: fileName,
+      text: text.slice(0, 120000)
+    });
+  } catch (error) {
+    return res.status(400).json({ error: error.message || 'Failed to extract file text' });
+  }
+};
+
+app.post('/api/vacancy/file-extract', handleVacancyFileExtract);
+app.post('/api/vacancy-file', handleVacancyFileExtract);
 
 app.post('/api/ai', async (req, res) => {
   try {

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { DEEP_DIVE_PROJECTS } from '../data/projectsData';
 
 const GITHUB_API_URL = 'https://api.github.com';
 const GITHUB_OWNER = 'hamletsspeak';
@@ -19,18 +20,14 @@ class Cache {
   get(key) {
     const item = this.data.get(key);
     if (!item) return null;
-    
+
     const isExpired = Date.now() - item.timestamp > CACHE_DURATION;
     if (isExpired) {
       this.data.delete(key);
       return null;
     }
-    
-    return item.value;
-  }
 
-  clear() {
-    this.data.clear();
+    return item.value;
   }
 }
 
@@ -52,6 +49,10 @@ const PROJECT_DESCRIPTIONS = {
   'university-labworks-python': 'Университетские лабораторные работы по Python: практические задания, домашние работы и примеры по основным темам курса.'
 };
 
+const PROJECT_DIRECTION_OVERRIDES = {
+  'frontend-labs': ['Frontend', 'Учебные проекты']
+};
+
 const buildDefaultDescription = (repo) => {
   const language = repo.language ? ` на ${repo.language}` : '';
   return `Проект${language} из GitHub-портфолио с открытым исходным кодом и практической разработкой.`;
@@ -60,80 +61,103 @@ const buildDefaultDescription = (repo) => {
 const getProjectDescription = (repo) =>
   PROJECT_DESCRIPTIONS[repo.name] || repo.description || buildDefaultDescription(repo);
 
+const toRepoModel = (repo) => ({
+  id: repo.id,
+  name: repo.name,
+  description: getProjectDescription(repo),
+  link: repo.html_url,
+  stars: repo.stargazers_count,
+  language: repo.language,
+  topics: repo.topics || [],
+  updatedAt: new Date(repo.updated_at)
+});
+
+const inferDirections = (repo) => {
+  const override = PROJECT_DIRECTION_OVERRIDES[repo.name.toLowerCase()];
+  if (override) return override;
+
+  const source = `${repo.name} ${repo.description} ${repo.language} ${(repo.topics || []).join(' ')}`.toLowerCase();
+  const directions = [];
+
+  if (/react|next|frontend|html|css/.test(source)) directions.push('Frontend');
+  if (/sql|postgres|database|db/.test(source)) directions.push('SQL');
+  if (/erp|process|bpmn|system design|analyst/.test(source)) directions.push('Системный анализ');
+  if (/api|node|express|go|rails|backend|server|docker|redis|rabbit|nginx/.test(source)) directions.push('Backend');
+  if (/\b(ai|ml|llm|openrouter|gpt)\b/.test(source)) directions.push('AI');
+  if (directions.length === 0) directions.push('Учебные проекты');
+
+  return directions;
+};
+
+const mergeDeepDiveData = (repositories) => {
+  const byName = new Map(repositories.map((repo) => [repo.name.toLowerCase(), repo]));
+
+  const deepDive = DEEP_DIVE_PROJECTS.map((project, index) => {
+    const githubRepo = byName.get(project.repoName.toLowerCase());
+
+    return {
+      ...project,
+      id: project.id || githubRepo?.id || `${project.repoName}-${index}`,
+      name: project.title,
+      description: githubRepo?.description || project.solution,
+      link: githubRepo?.link || `https://github.com/${GITHUB_OWNER}/${project.repoName}`,
+      stars: githubRepo?.stars || 0,
+      language: githubRepo?.language || project.stack[0],
+      updatedAt: githubRepo?.updatedAt || null
+    };
+  });
+
+  const deepDiveNames = new Set(DEEP_DIVE_PROJECTS.map((item) => item.repoName.toLowerCase()));
+  const regularProjects = repositories
+    .filter((repo) => !deepDiveNames.has(repo.name.toLowerCase()))
+    .map((repo) => ({
+      ...repo,
+      directions: inferDirections(repo),
+      role: 'Разработчик',
+      complexity: 'Средняя',
+      problem: 'Практическая задача из портфолио/обучения.',
+      solution: 'Реализация в рамках репозитория с фокусом на рабочий результат.',
+      result: 'Рабочий проект в GitHub-портфолио.',
+      learned: 'Усиление практики разработки и проектирования.',
+      stack: [repo.language || 'General']
+    }));
+
+  return [...deepDive, ...regularProjects];
+};
+
 export const getRepositories = async () => {
   try {
     const cachedData = cache.get('repositories');
-    if (cachedData) {
-      console.log('Используются кэшированные данные');
-      return cachedData;
-    }
+    if (cachedData) return cachedData;
 
-    console.log('Начинаем загрузку репозиториев...');
-    
     const headers = {
-      'Accept': 'application/vnd.github.v3+json'
+      Accept: 'application/vnd.github.v3+json'
     };
 
-    // Добавляем токен только если он существует
     if (process.env.REACT_APP_GITHUB_TOKEN) {
       headers.Authorization = `token ${process.env.REACT_APP_GITHUB_TOKEN}`;
     }
 
     const response = await axios.get(`${GITHUB_API_URL}/users/${GITHUB_OWNER}/repos`, {
       headers,
-      timeout: 10000 // 10 секунд таймаут
+      timeout: 10000
     });
 
     if (response.status === 200 && Array.isArray(response.data)) {
       const repositories = response.data
-        .filter(repo => !repo.fork && !repo.private)
-        .map(repo => ({
-          id: repo.id,
-          name: repo.name,
-          description: repo.description,
-          link: repo.html_url,
-          stars: repo.stargazers_count,
-          language: repo.language,
-          topics: repo.topics || [],
-          updatedAt: new Date(repo.updated_at)
-        }));
-
-      const processedData = repositories
-        .map((repo) => ({
-          ...repo,
-          description: getProjectDescription(repo)
-        }))
+        .filter((repo) => !repo.fork && !repo.private)
+        .map(toRepoModel)
         .sort((a, b) => b.updatedAt - a.updatedAt);
 
-      if (processedData.length > 0) {
-        console.log('Обработано репозиториев:', processedData.length);
-        cache.set('repositories', processedData);
-        return processedData;
-      }
+      const merged = mergeDeepDiveData(repositories);
+      cache.set('repositories', merged);
+      return merged;
     }
-    
+
     throw new Error('Не удалось получить данные о репозиториях');
-  } catch (error) {
-    console.error('Ошибка при получении репозиториев:', error);
-    
-    if (error.code === 'ECONNABORTED') {
-      throw new Error('Превышено время ожидания запроса. Проверьте подключение к интернету.');
-    }
-    
-    if (error.response) {
-      const { status, data } = error.response;
-      
-      if (status === 403) {
-        throw new Error('Превышен лимит запросов к GitHub API. Пожалуйста, подождите несколько минут.');
-      }
-      
-      if (status === 404) {
-        throw new Error('Пользователь не найден или репозитории недоступны.');
-      }
-      
-      throw new Error(`Ошибка GitHub API: ${data.message || 'Неизвестная ошибка'}`);
-    }
-    
-    throw new Error('Не удалось подключиться к GitHub. Проверьте подключение к интернету.');
+  } catch {
+    const fallback = mergeDeepDiveData([]);
+    cache.set('repositories', fallback);
+    return fallback;
   }
 };

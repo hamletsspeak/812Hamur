@@ -12,6 +12,7 @@ import "./index.css";
 // Lazy load components
 const Header = lazy(() => import("./Header"));
 const About = lazy(() => import("./About"));
+const ResumeMatch = lazy(() => import("./components/ResumeMatch"));
 const Projects = lazy(() => import("./Projects"));
 const Contact = lazy(() => import("./Contact"));
 const SecretVideoSection = lazy(() => import("./SecretVideoSection"));
@@ -139,6 +140,7 @@ function App() {
                       <main>
                         <Header />
                         <About />
+                        <ResumeMatch />
                         <Projects />
                         <Contact />
                         <SecretVideoSection />

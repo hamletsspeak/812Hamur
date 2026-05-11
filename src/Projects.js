@@ -2,28 +2,81 @@ import React, { useState, useEffect, memo } from 'react';
 import { m, AnimatePresence } from './config/animations';
 import { fadeInFromRightVariant, useScrollAnimation } from './config/animations';
 import { getRepositories } from './services/githubService';
-import { useLanguage } from "./contexts/LanguageContext";
+import { useLanguage } from './contexts/LanguageContext';
+import { PROJECT_DIRECTIONS } from './data/projectsData';
 
-const ProjectCard = memo(({ project, onViewGithub }) => {
+const DetailRow = ({ label, value }) => (
+  <div>
+    <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+    <p className="text-sm sm:text-base text-slate-700 mt-1 leading-6">{value}</p>
+  </div>
+);
+
+const ProjectCard = memo(({ project, isExpanded, onToggleDetails, onViewGithub }) => {
   const isSasagramProject = /сасаграм|sasagram/i.test(project?.name || '');
 
   return (
     <m.div
       variants={fadeInFromRightVariant}
       {...useScrollAnimation(0.2)}
-      className="glass-card rounded-3xl p-5 sm:p-8 w-full"
+      className="glass-card rounded-3xl p-5 sm:p-8 w-full self-start h-fit"
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 break-words">{project.name}</h3>
-        {project.stars > 0 && (
-          <span className="accent-pill">{project.stars} stars</span>
-        )}
+        {project.stars > 0 && <span className="accent-pill">{project.stars} stars</span>}
       </div>
-      <p className="mt-3 sm:mt-4 text-slate-600 leading-6 sm:leading-7 text-sm sm:text-base">{project.description || 'Описание отсутствует'}</p>
-      {project.language && (
-        <p className="mt-3 text-sm text-sky-700 font-semibold">{project.language}</p>
-      )}
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {(project.directions || []).map((direction) => (
+          <span key={`${project.id}-${direction}`} className="rounded-full bg-sky-50 text-sky-700 px-3 py-1 text-xs font-semibold">
+            {direction}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-4">
+        <p className="text-slate-600 leading-6 sm:leading-7 text-sm sm:text-base">{project.description || 'Описание отсутствует'}</p>
+
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <DetailRow label="Роль" value={project.role} />
+          <DetailRow label="Сложность" value={project.complexity} />
+        </div>
+
+        <AnimatePresence initial={false}>
+          {isExpanded && (
+            <m.div
+              key="details"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.28, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              <div className="mt-5 border-t border-slate-200 pt-5 space-y-4">
+                <DetailRow label="Проблема" value={project.problem} />
+                <DetailRow label="Решение" value={project.solution} />
+                <DetailRow label="Результат" value={project.result} />
+                <DetailRow label="Чему научился" value={project.learned} />
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Стек</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(project.stack || []).map((item) => (
+                      <span key={`${project.id}-${item}`} className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-700">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       <div className="mt-6 flex gap-3 flex-wrap">
+        <button onClick={() => onToggleDetails(project.id)} className="btn-outline font-semibold">
+          {isExpanded ? 'Скрыть детали' : 'Подробнее'}
+        </button>
         <button onClick={() => onViewGithub(project.link)} className="btn-primary font-semibold">
           Смотреть на GitHub
         </button>
@@ -41,8 +94,9 @@ ProjectCard.displayName = 'ProjectCard';
 
 const Projects = () => {
   const { t } = useLanguage();
-  const [current, setCurrent] = useState(0);
   const [projects, setProjects] = useState([]);
+  const [activeDirection, setActiveDirection] = useState(PROJECT_DIRECTIONS[0]);
+  const [expandedProjectIds, setExpandedProjectIds] = useState(() => new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -72,22 +126,52 @@ const Projects = () => {
 
   const handleViewGithub = (link) => window.open(link, '_blank', 'noopener,noreferrer');
 
+  const filteredProjects = projects.filter((project) => {
+    if (activeDirection === 'Все') return true;
+    return (project.directions || []).includes(activeDirection);
+  });
+
+  const leftColumnProjects = filteredProjects.filter((_, index) => index % 2 === 0);
+  const rightColumnProjects = filteredProjects.filter((_, index) => index % 2 === 1);
+
+  const handleToggleDetails = (projectId) => {
+    setExpandedProjectIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+      }
+      return next;
+    });
+  };
+
   return (
     <section id="projects" className="snap-start min-h-screen px-5 py-24">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-10">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
           <div>
             <span className="accent-pill">Portfolio</span>
-            <h2 className="section-title mt-4 text-slate-900 font-bold text-3xl sm:text-5xl leading-tight">{t("projectsTitle")}</h2>
+            <h2 className="section-title mt-4 text-slate-900 font-bold text-3xl sm:text-5xl leading-tight">{t('projectsTitle')}</h2>
           </div>
-          {projects.length > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-slate-600">
-              {current + 1} / {projects.length}
-            </div>
-          )}
+          <div className="rounded-2xl border border-slate-200 bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-slate-600">
+            {filteredProjects.length} проектов
+          </div>
         </div>
 
-        {loading && <div className="glass-card rounded-3xl p-8 text-slate-600">{t("loadingProjects")}</div>}
+        <div className="mb-8 flex flex-wrap gap-2">
+          {PROJECT_DIRECTIONS.map((direction) => (
+            <button
+              key={direction}
+              className={activeDirection === direction ? 'btn-primary text-sm' : 'btn-outline text-sm'}
+              onClick={() => setActiveDirection(direction)}
+            >
+              {direction}
+            </button>
+          ))}
+        </div>
+
+        {loading && <div className="glass-card rounded-3xl p-8 text-slate-600">{t('loadingProjects')}</div>}
 
         {!loading && error && (
           <div className="glass-card rounded-3xl p-8 border-red-200">
@@ -95,16 +179,51 @@ const Projects = () => {
           </div>
         )}
 
-        {!loading && !error && projects.length > 0 && (
+        {!loading && !error && filteredProjects.length > 0 && (
           <>
-            <AnimatePresence mode="wait">
-              <ProjectCard key={projects[current].id || current} project={projects[current]} onViewGithub={handleViewGithub} />
-            </AnimatePresence>
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <button className="btn-outline w-full sm:w-auto" onClick={() => setCurrent((p) => (p - 1 + projects.length) % projects.length)}>Назад</button>
-              <button className="btn-primary w-full sm:w-auto" onClick={() => setCurrent((p) => (p + 1) % projects.length)}>Вперёд</button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start lg:hidden">
+              {filteredProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  isExpanded={expandedProjectIds.has(project.id)}
+                  onToggleDetails={handleToggleDetails}
+                  onViewGithub={handleViewGithub}
+                />
+              ))}
+            </div>
+
+            <div className="hidden lg:grid lg:grid-cols-2 gap-5 items-start">
+              <div className="space-y-5">
+                {leftColumnProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    isExpanded={expandedProjectIds.has(project.id)}
+                    onToggleDetails={handleToggleDetails}
+                    onViewGithub={handleViewGithub}
+                  />
+                ))}
+              </div>
+              <div className="space-y-5">
+                {rightColumnProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    isExpanded={expandedProjectIds.has(project.id)}
+                    onToggleDetails={handleToggleDetails}
+                    onViewGithub={handleViewGithub}
+                  />
+                ))}
+              </div>
             </div>
           </>
+        )}
+
+        {!loading && !error && filteredProjects.length === 0 && (
+          <div className="glass-card rounded-3xl p-8 text-slate-600">
+            Для этого направления пока нет проектов.
+          </div>
         )}
       </div>
     </section>
@@ -112,3 +231,4 @@ const Projects = () => {
 };
 
 export default memo(Projects);
+
