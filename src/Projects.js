@@ -23,20 +23,7 @@ const ProjectCard = memo(({ project, isExpanded, onToggleDetails, onViewGithub }
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <h3 className="text-xl sm:text-2xl font-bold text-slate-900 break-words">{project.name}</h3>
-        {project.stars > 0 && (
-          <span className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center" title={`${project.stars} stars`}>
-            <svg viewBox="0 0 64 64" className="absolute inset-0 h-full w-full" aria-hidden="true">
-              <path
-                d="M32 6.5 39.4 23.1l18.1 1.8-13.7 11.9 4.1 17.7L32 45.8 16.1 54.5l4.1-17.7L6.5 24.9l18.1-1.8L32 6.5z"
-                fill="#fbbf24"
-                stroke="#d97706"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="relative z-10 text-xs font-bold text-amber-950">{project.stars}</span>
-          </span>
-        )}
+        {project.stars > 0 && <span className="accent-pill">{project.stars} stars</span>}
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
