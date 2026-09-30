@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './LocationAutocomplete';
-import { getCityByCoords } from '../utils/geoUtils';
 import { useLanguage } from "../contexts/LanguageContext";
 
 const PROFILE_STORAGE_KEY = 'local_profile_data_v1';
@@ -24,21 +23,6 @@ const ProfileSetup = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [validationErrors] = useState({});
-
-  useEffect(() => {
-    if (!formData.location && typeof window !== 'undefined') {
-      const loc = localStorage.getItem('userLocation');
-      if (loc && loc !== 'denied' && loc !== 'unsupported') {
-        try {
-          const { lat, lon } = JSON.parse(loc);
-          getCityByCoords(lat, lon).then(city => {
-            if (city) setFormData(prev => ({ ...prev, location: city }));
-          });
-        } catch {}
-      }
-    }
-    // eslint-disable-next-line
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

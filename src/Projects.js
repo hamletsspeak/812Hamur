@@ -147,12 +147,15 @@ const Projects = () => {
   };
 
   return (
-    <section id="projects" className="snap-start min-h-screen px-5 py-24">
+    <section id="projects" className="snap-start px-5 py-20 sm:py-24">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
           <div>
             <span className="accent-pill">Portfolio</span>
             <h2 className="section-title mt-4 text-slate-900 font-bold text-3xl sm:text-5xl leading-tight">{t('projectsTitle')}</h2>
+            <p className="mt-3 text-slate-600 max-w-xl leading-relaxed">
+              Ключевые кейсы с ролью, стеком и результатом — не просто список репозиториев.
+            </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-slate-600">
             {filteredProjects.length} проектов

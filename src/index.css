@@ -74,9 +74,9 @@ body {
 }
 
 .section-title {
-  font-size: clamp(2rem, 5vw, 3.8rem);
-  line-height: 1.05;
-  letter-spacing: 0.02em;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
 }
 
 .hero-gradient-text {

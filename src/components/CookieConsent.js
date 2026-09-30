@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-const COOKIE_KEY = 'cookie_consent_accepted';
+const COOKIE_KEY = "cookie_consent_accepted";
 
 const CookieConsent = () => {
   const [visible, setVisible] = useState(false);
@@ -13,22 +13,20 @@ const CookieConsent = () => {
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem(COOKIE_KEY, 'true');
+    localStorage.setItem(COOKIE_KEY, "true");
     setVisible(false);
   };
 
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full z-50 flex justify-center items-end pointer-events-none">
-      <div className="pointer-events-auto bg-[#23272f] text-gray-200 border border-[#374151] rounded-t-xl shadow-xl p-4 mb-2 max-w-xl w-full flex flex-col sm:flex-row items-center gap-4 animate-fadeInUp">
-        <span className="flex-1 text-sm text-gray-300">
-          Этот сайт использует cookie-файлы для улучшения пользовательского опыта. Продолжая использовать сайт, вы соглашаетесь с <a href="/privacy" className="underline text-blue-400 hover:text-blue-300" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a>.
+    <div className="fixed bottom-0 left-0 w-full z-50 flex justify-center items-end pointer-events-none px-4 pb-4">
+      <div className="pointer-events-auto glass-card rounded-2xl shadow-xl p-4 max-w-xl w-full flex flex-col sm:flex-row items-center gap-4">
+        <span className="flex-1 text-sm text-slate-600 leading-relaxed">
+          Сайт использует cookie для базовой работы интерфейса. Продолжая пользоваться сайтом,
+          вы соглашаетесь с этим.
         </span>
-        <button
-          onClick={handleAccept}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg transition"
-        >
+        <button type="button" onClick={handleAccept} className="btn-primary font-semibold shrink-0">
           Принять
         </button>
       </div>
