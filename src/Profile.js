@@ -3,7 +3,6 @@ import { useAuth } from './contexts/AuthContext';
 import Toast from './components/Toast';
 import { IMaskInput } from 'react-imask';
 import LocationAutocomplete from './components/LocationAutocomplete';
-import { getCityByCoords } from './utils/geoUtils';
 import { useLanguage } from './contexts/LanguageContext';
 
 const Profile = () => {
@@ -35,17 +34,6 @@ const Profile = () => {
       } catch {}
     }
 
-    if (!raw && typeof window !== 'undefined') {
-      const loc = localStorage.getItem('userLocation');
-      if (loc && loc !== 'denied' && loc !== 'unsupported') {
-        try {
-          const { lat, lon } = JSON.parse(loc);
-          getCityByCoords(lat, lon).then(city => {
-            if (city) setUserInfo(prev => ({ ...prev, location: city }));
-          });
-        } catch {}
-      }
-    }
   }, [user]);
 
   const showToast = (message, type = 'success') => {

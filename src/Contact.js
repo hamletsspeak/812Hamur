@@ -27,39 +27,41 @@ const SpoilerContactCard = memo(({ icon, alt, label, value, hint }) => (
       </div>
     </div>
     <p className="hidden md:block text-xs text-slate-500 text-right max-w-[240px] leading-5">
-      <spoiler-span reveal-duration="350" density="10" particle-lifetime="140">
-        {hint}
-      </spoiler-span>
+      {hint}
     </p>
   </m.div>
 ));
 
 const Contact = memo(() => {
   return (
-    <section id="contact" className="snap-start min-h-screen px-5 py-24">
+    <section id="contact" className="snap-start px-5 py-20 sm:py-24">
       <div className="max-w-6xl mx-auto">
-        <h2 className="section-title text-slate-900 font-bold">Мои контакты</h2>
+        <span className="accent-pill">Связь</span>
+        <h2 className="section-title mt-4 text-slate-900 font-bold">Мои контакты</h2>
+        <p className="mt-4 text-slate-600 max-w-xl leading-relaxed">
+          Напишите удобным способом — обычно отвечаю быстро в Telegram и по почте.
+        </p>
         <div className="mt-10 grid grid-cols-1 gap-5 max-w-3xl">
           <SpoilerContactCard
             icon={yandexIconPath}
             alt="Yandex Mail"
             label="Email"
             value={resume?.contacts?.email || "Не указано"}
-            hint="Возможно сразу замечу и отвечу"
+            hint="Для деловых писем и офферов"
           />
           <SpoilerContactCard
             icon={phoneIconPath}
             alt="Phone"
             label="Телефон"
             value={resume?.contacts?.phone || "Не указано"}
-            hint="возможно подумаю что вы мошенник, звоните 2 раза"
+            hint="Лучше сначала написать в мессенджер"
           />
           <SpoilerContactCard
             icon={telegramIconPath}
             alt="Telegram"
             label="Telegram"
             value={resume?.contacts?.telegram || "Не указано"}
-            hint="замечу сразу и отвечу быстро"
+            hint="Самый быстрый способ связи"
           />
         </div>
       </div>
@@ -67,5 +69,5 @@ const Contact = memo(() => {
   );
 });
 
-Contact.displayName = 'Contact';
+Contact.displayName = "Contact";
 export default Contact;

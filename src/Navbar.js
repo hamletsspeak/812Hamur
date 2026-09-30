@@ -31,7 +31,6 @@ const Navbar = () => {
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
-
   const handleScroll = (e, id) => {
     e.preventDefault();
     if (location.pathname !== '/') {
@@ -58,9 +57,9 @@ const Navbar = () => {
   };
 
   const mainLinks = [
-    { id: 'about', text: t('aboutTitle') },
-    { id: 'projects', text: t('projectsTitle') },
-    { id: 'contact', text: t('contactsTitle') }
+    { id: "about", text: t("aboutTitle") },
+    { id: "projects", text: t("projectsTitle") },
+    { id: "contact", text: t("contactsTitle") },
   ];
 
   return (
@@ -68,7 +67,7 @@ const Navbar = () => {
       <m.nav
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`fixed top-0 left-0 w-full z-50 px-4 sm:px-8 py-4 bg-white/55 backdrop-blur-2xl [backdrop-filter:saturate(180%)_blur(20px)] border-b border-white/60 shadow-[0_8px_30px_rgba(15,23,42,0.08)] navbar-font ${typeof window !== 'undefined' && window.innerWidth <= 640 ? 'mobile-navbar-transparent' : ''}`}
+        className="fixed top-0 left-0 w-full z-50 px-4 sm:px-8 py-4 bg-white/70 backdrop-blur-2xl [backdrop-filter:saturate(180%)_blur(20px)] border-b border-white/60 shadow-[0_8px_30px_rgba(15,23,42,0.08)] navbar-font mobile-navbar-transparent"
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <button onClick={handleLogoClick} className="flex items-center gap-2 sm:gap-3 min-w-0">

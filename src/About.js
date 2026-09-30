@@ -10,11 +10,14 @@ const About = () => {
   const hiddenCompanies = new Set(["ООО «Альберт Кутуков Бизнес»", "Т-Банк"]);
 
   return (
-    <section id="about" className="snap-start min-h-screen px-5 py-24">
+    <section id="about" className="snap-start px-5 py-20 sm:py-24">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <span className="accent-pill">Резюме</span>
           <h2 className="section-title mt-4 font-bold text-slate-900">{t("aboutTitle")}</h2>
+          <p className="mt-4 text-slate-600 leading-relaxed max-w-sm">
+            Кратко: кто я, с чем работал и какой опыт уже есть на практике.
+          </p>
         </div>
 
         <m.div
@@ -37,7 +40,9 @@ const About = () => {
                     "Не указано"
                   )}
                 </h3>
-                <p className="text-sky-700 mt-1 font-semibold break-words">{resume.title || "Название резюме не указано"}</p>
+                <p className="text-sky-700 mt-1 font-semibold break-words">
+                  {resume.title || "Название резюме не указано"}
+                </p>
               </div>
             </div>
 
@@ -64,7 +69,11 @@ const About = () => {
               </div>
               <div className="rounded-xl bg-slate-50 border border-slate-200 p-3">
                 <p className="text-slate-500 text-sm">Обновлено</p>
-                <p className="text-slate-900 mt-1">{resume.parsedAt ? new Date(resume.parsedAt).toLocaleDateString("ru-RU") : "Не указано"}</p>
+                <p className="text-slate-900 mt-1">
+                  {resume.parsedAt
+                    ? new Date(resume.parsedAt).toLocaleDateString("ru-RU")
+                    : "Не указано"}
+                </p>
               </div>
             </div>
 
@@ -97,7 +106,10 @@ const About = () => {
               <h4 className="font-bold text-slate-900 mb-2">Ключевые навыки</h4>
               <div className="flex flex-wrap gap-2">
                 {(resume.skills?.length ? resume.skills : ["Навыки не найдены"]).map((skill) => (
-                  <span key={skill} className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-sm text-sky-700">
+                  <span
+                    key={skill}
+                    className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-sm text-sky-700"
+                  >
                     {skill}
                   </span>
                 ))}
@@ -107,8 +119,14 @@ const About = () => {
             <div>
               <h4 className="font-bold text-slate-900 mb-2">Последний опыт</h4>
               <div className="space-y-3">
-                {(resume.experience?.length ? resume.experience : [{ company: "Нет данных", role: "", period: "", description: "" }]).map((job, idx) => (
-                  <div key={`${job.company}-${idx}`} className="rounded-xl border border-slate-200 bg-white p-4">
+                {(resume.experience?.length
+                  ? resume.experience
+                  : [{ company: "Нет данных", role: "", period: "", description: "" }]
+                ).map((job, idx) => (
+                  <div
+                    key={`${job.company}-${idx}`}
+                    className="rounded-xl border border-slate-200 bg-white p-4"
+                  >
                     <p className="font-semibold text-slate-900 break-words">
                       {hiddenCompanies.has(job.company) ? (
                         <spoiler-span reveal-duration="250">{job.company}</spoiler-span>
@@ -118,7 +136,9 @@ const About = () => {
                     </p>
                     <p className="text-sky-700 text-sm mt-1 break-words">{job.role}</p>
                     <p className="text-slate-500 text-sm mt-1">{job.period}</p>
-                    {job.description && <p className="text-slate-600 mt-2 text-sm">{job.description}</p>}
+                    {job.description && (
+                      <p className="text-slate-600 mt-2 text-sm leading-relaxed">{job.description}</p>
+                    )}
                   </div>
                 ))}
               </div>

@@ -22,28 +22,6 @@ function App() {
   const [isSiteLoading, setIsSiteLoading] = React.useState(true);
 
   useEffect(() => {
-    if (!localStorage.getItem("userLocation")) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const coords = {
-              lat: position.coords.latitude,
-              lon: position.coords.longitude,
-            };
-            localStorage.setItem("userLocation", JSON.stringify(coords));
-          },
-          (err) => {
-            localStorage.setItem("userLocation", "denied");
-          },
-          { enableHighAccuracy: false, timeout: 10000 }
-        );
-      } else {
-        localStorage.setItem("userLocation", "unsupported");
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     let mounted = true;
 
     const preloadImage = (src) =>
@@ -63,15 +41,17 @@ function App() {
         video.src = src;
       });
 
-    const gatherMediaAssets = () => {
-      const mems = require.context("./icons/mems", false, /\.(png|jpe?g|gif|webp)$/i);
-      const icons = require.context("./icons", false, /\.(png|jpe?g|gif|webp|webm|mp4)$/i);
-      return [...mems.keys().map(mems), ...icons.keys().map(icons)];
-    };
+    const gatherCriticalAssets = () => [
+      require("./icons/anim_duck-v2.webm"),
+      require("./icons/anim_duck-v2-mobile.webp"),
+      require("./icons/anim_duck-v2-mobile.png"),
+      require("./icons/кот.jpg"),
+      require("./icons/ai-assistant-sticker-v2.gif"),
+    ];
 
     const startLoading = async () => {
-      const minDelay = new Promise((resolve) => window.setTimeout(resolve, 1200));
-      const urls = gatherMediaAssets();
+      const minDelay = new Promise((resolve) => window.setTimeout(resolve, 600));
+      const urls = gatherCriticalAssets();
       const preloadTasks = urls.map((url) =>
         /\.(mp4|webm)$/i.test(url) ? preloadVideo(url) : preloadImage(url)
       );
@@ -84,7 +64,7 @@ function App() {
 
     const fallbackTimer = window.setTimeout(() => {
       if (mounted) setIsSiteLoading(false);
-    }, 9000);
+    }, 5000);
 
     return () => {
       mounted = false;
@@ -97,14 +77,15 @@ function App() {
       <div className="relative min-h-screen overflow-hidden bg-[#eef2f7] flex items-center justify-center px-5">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-24 -left-24 h-[420px] w-[420px] rounded-full bg-sky-100/80 blur-3xl" />
-          <div className="absolute top-[22%] right-[-120px] h-[360px] w-[360px] rounded-full bg-violet-100/70 blur-3xl" />
+          <div className="absolute top-[22%] right-[-120px] h-[360px] w-[360px] rounded-full bg-sky-50/80 blur-3xl" />
           <div className="absolute bottom-[-120px] left-[18%] h-[380px] w-[380px] rounded-full bg-amber-50/80 blur-3xl" />
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/30 to-transparent" />
         </div>
-        <div className="w-full max-w-[640px] animate-pulse">
-          <div className="mx-auto h-10 w-[86%] rounded-xl bg-gradient-to-r from-slate-300/80 via-slate-200/70 to-slate-300/80" />
-          <div className="mx-auto mt-5 h-6 w-[62%] rounded-lg bg-gradient-to-r from-slate-300/70 via-slate-200/65 to-slate-300/70" />
-          <div className="mx-auto mt-4 h-6 w-[42%] rounded-lg bg-gradient-to-r from-slate-300/65 via-slate-200/60 to-slate-300/65" />
+        <div className="w-full max-w-[420px] text-center">
+          <p className="text-slate-900 text-2xl font-bold tracking-tight">hamletsspeak</p>
+          <div className="mx-auto mt-6 h-1.5 w-28 overflow-hidden rounded-full bg-slate-200">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-sky-400" />
+          </div>
         </div>
       </div>
     );
@@ -118,7 +99,7 @@ function App() {
             <div className="relative min-h-screen overflow-x-hidden bg-[#eef2f7]">
               <div className="pointer-events-none fixed inset-0 -z-10">
                 <div className="absolute -top-24 -left-24 h-[420px] w-[420px] rounded-full bg-sky-100/80 blur-3xl" />
-                <div className="absolute top-[22%] right-[-120px] h-[360px] w-[360px] rounded-full bg-violet-100/70 blur-3xl" />
+                <div className="absolute top-[22%] right-[-120px] h-[360px] w-[360px] rounded-full bg-sky-50/70 blur-3xl" />
                 <div className="absolute bottom-[-120px] left-[18%] h-[380px] w-[380px] rounded-full bg-amber-50/80 blur-3xl" />
                 <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/30 to-transparent" />
               </div>

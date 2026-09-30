@@ -228,7 +228,7 @@ const SecretVideoSection = () => {
   };
 
   return (
-    <section id="hidden-video" className="snap-start min-h-screen px-5 py-24">
+    <section id="hidden-video" className="snap-start px-5 py-20 sm:py-24">
       <div className="max-w-6xl mx-auto min-h-[70vh] flex items-center justify-center">
         <div className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white/70 px-4 py-7 sm:px-10 sm:py-10 text-center shadow-sm">
           <h2 className="text-2xl leading-tight sm:text-4xl text-slate-900 font-bold tracking-tight">Оцените сайт, пожалуйста</h2>
