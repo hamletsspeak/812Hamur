@@ -28,7 +28,7 @@ const translations = {
   'Некорректный email': 'Некорректный email',
   'Укажите местоположение': 'Укажите местоположение',
   aboutTitle: 'Обо мне',
-  aboutText: 'Данные ниже автоматически обновляются через HH API.',
+  aboutText: 'Frontend-разработчик: React, React Native и практические проекты.',
   projectsTitle: 'Мои проекты',
   loadingProjects: 'Загрузка проектов...',
   retryAttempt: 'Повторная попытка',

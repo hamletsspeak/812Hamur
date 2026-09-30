@@ -13,6 +13,54 @@ import memeOneG from "./icons/mems/omg.jpg";
 import memeOneH from "./icons/mems/Dunbahh.jpg";
 import { getStoredSiteRating, saveSiteRating } from "./services/ratingService";
 
+const RatingStarButton = ({
+  value,
+  label,
+  active,
+  disabled,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
+  style,
+  className = "",
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    onFocus={onFocus}
+    onBlur={onBlur}
+    disabled={disabled}
+    style={style}
+    className={`relative z-10 inline-flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 transition-all duration-150 hover:-translate-y-0.5 disabled:opacity-60 ${className}`}
+    aria-label={label}
+  >
+    <svg
+      viewBox="0 0 64 64"
+      className="absolute inset-0 h-full w-full drop-shadow-sm"
+      aria-hidden="true"
+    >
+      <path
+        d="M32 6.5 39.4 23.1l18.1 1.8-13.7 11.9 4.1 17.7L32 45.8 16.1 54.5l4.1-17.7L6.5 24.9l18.1-1.8L32 6.5z"
+        fill={active ? "#fbbf24" : "#ffffff"}
+        stroke={active ? "#d97706" : "#94a3b8"}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+    <span
+      className={`relative z-10 text-lg sm:text-xl font-bold ${
+        active ? "text-amber-950" : "text-slate-700"
+      }`}
+    >
+      {value}
+    </span>
+  </button>
+);
+
 const SecretVideoSection = () => {
   const videoRef = useRef(null);
   const [selectedRating, setSelectedRating] = useState(0);
@@ -189,44 +237,33 @@ const SecretVideoSection = () => {
           </p>
 
           <div className="mt-7 relative group">
-            <div className="flex items-center justify-center gap-2 sm:gap-3 relative h-14">
-            <button
-              type="button"
-              onClick={() => handleRate(1)}
-              onMouseEnter={() => {
-                setIsOneHovered(true);
-                handleOneHover();
-              }}
-              onMouseLeave={() => setIsOneHovered(false)}
-              onFocus={() => setIsOneHovered(true)}
-              onBlur={() => setIsOneHovered(false)}
-              disabled={isSaving}
-              style={oneButtonStyle}
-              className={`relative z-10 h-12 w-12 rounded-xl border text-lg font-bold transition-all duration-150 ${
-                selectedRating >= 1
-                  ? "border-sky-500 bg-sky-100 text-sky-700"
-                  : "border-slate-300 bg-white text-slate-700"
-              } hover:-translate-y-0.5 disabled:opacity-60 ${oneConvertedToFive ? "animate-pulse" : ""}`}
-              aria-label={oneConvertedToFive ? "Оценка 5" : "Оценка 1"}
-            >
-              {oneConvertedToFive ? 5 : 1}
-            </button>
-            {[2, 3, 4, 5].map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => handleRate(value)}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-3 relative h-16 sm:h-20">
+              <RatingStarButton
+                value={oneConvertedToFive ? 5 : 1}
+                label={oneConvertedToFive ? "Оценка 5" : "Оценка 1"}
+                active={selectedRating >= 1}
                 disabled={isSaving}
-                className={`h-12 w-12 rounded-xl border text-lg font-bold transition-all ${
-                  selectedRating >= value
-                    ? "border-sky-500 bg-sky-100 text-sky-700"
-                    : "border-slate-300 bg-white text-slate-700"
-                } hover:-translate-y-0.5 disabled:opacity-60`}
-                aria-label={`Оценка ${value}`}
-              >
-                {value}
-              </button>
-            ))}
+                style={oneButtonStyle}
+                className={oneConvertedToFive ? "animate-pulse" : ""}
+                onClick={() => handleRate(1)}
+                onMouseEnter={() => {
+                  setIsOneHovered(true);
+                  handleOneHover();
+                }}
+                onMouseLeave={() => setIsOneHovered(false)}
+                onFocus={() => setIsOneHovered(true)}
+                onBlur={() => setIsOneHovered(false)}
+              />
+              {[2, 3, 4, 5].map((value) => (
+                <RatingStarButton
+                  key={value}
+                  value={value}
+                  label={`Оценка ${value}`}
+                  active={selectedRating >= value}
+                  disabled={isSaving}
+                  onClick={() => handleRate(value)}
+                />
+              ))}
             </div>
             <p className={`pointer-events-none mt-2 text-xs text-slate-500 transition-opacity duration-300 ${isOneHovered ? "opacity-60" : "opacity-0"}`}>
               На оценку 1 можно нажимать несколько раз
